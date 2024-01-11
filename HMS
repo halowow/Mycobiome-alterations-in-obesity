@@ -1,0 +1,285 @@
+###HumanMycobiomeScan installation
+
+cd /lustre/bin
+mkdir HumanMycobiomeScan
+cd /lustre/bin/HumanMycobiomeScan
+
+wget https://sourceforge.net/projects/hmscan/files/HMS.tar.gz
+wget https://sourceforge.net/projects/hmscan/files/Normalisation_readme.txt
+wget https://sourceforge.net/projects/hmscan/files/README.txt
+wget https://sourceforge.net/projects/hmscan/files/Training%20tutorial.txt
+wget https://sourceforge.net/projects/hmscan/files/Database%20build%20instructions.txt
+wget https://sourceforge.net/projects/hmscan/files/license.txt
+
+cd /lustre/bin/HumanMycobiomeScan
+mkdir Database
+mkdir Trainning_data
+
+cd /lustre/bin/HumanMycobiomeScan/Database
+wget https://sourceforge.net/projects/hmscan/files/Database/fungi_FULL.fasta.bz2
+cd /lustre/bin/HumanMycobiomeScan/Trainning_data
+wget https://sourceforge.net/projects/hmscan/files/Training_data/Mock_diff_rab_1.fastq.gz
+wget https://sourceforge.net/projects/hmscan/files/Training_data/Mock_training_data.tar.gz
+
+cd /lustre/bin/HumanMycobiomeScan/
+tar -zxvf HMS.tar.gz
+
+cd /lustre/bin/HumanMycobiomeScan/HMS/database
+gzip -d Bacteria_custom.tar.gz
+tar xvf Bacteria_custom.tar
+gzip -d  bowtie2.tar.gz
+tar xvf bowtie2.tar
+mv final_database bowtie2
+gzip -d hg19/*
+
+cd /lustre/bin/HumanMycobiomeScan/HMS/database
+cd hg19/
+#Now you need to create the indexes database for running bmtagger. bmtagger and other bmtools necessary to run HMS are already present in the $PWD/HMS/tools folder. You can eventually download a compatible version of bmtools for your operating system at ftp://ftp.ncbi.nlm.nih.gov/pub/agarwala/bmtagger.
+#Now you need to:
+#-  Make indexes for bmfilter. 
+bmtool -d hg19reference.fa -o hg19reference.bitmask -A 0 -w 18
+#- Make index for srprism
+srprism mkindex -i hg19reference.fa -o hg19reference.srprism -M 7168
+#- Make blastdb for blast
+#(mkdir /lustre/bin/openssl1.0
+/lustre/bin/anaconda3/bin/conda install -c bioconda openssl=1.0 --prefix=/lustre/bin/openssl1.0
+cp /lustre/bin/openssl1.0/lib/libssl.so.1.0.0 /lustre/bin/blast/lib/)
+makeblastdb -in hg19reference.fa -dbtype nucl
+
+##we have fungi_LITE already, need to have fungi_FULL
+bowtie2-build -f /lustre/bin/HumanMycobiomeScan/Database/fungi_FULL.fasta /lustre/bin/HumanMycobiomeScan/HMS/database/bowtie2/fungi_FULL
+
+##extract species taxonomic lineage data to each species 
+# lineages-2019-02-20_ncbi_taxonomy.csv was downloaded from https://github.com/zyxue/ncbitax2lin
+cd /lustre/bin/HumanMycobiomeScan/
+sed "s/,/\t/g" lineages-2019-02-20_ncbi_taxonomy.csv | cut -f 1-7 > ncbi_taxonomy1.txt
+sed "s/,/\t/g" lineages-2019-02-20_ncbi_taxonomy.csv | cut -f 8 | sed 's/ /_/g'> ncbi_taxonomy_species.txt
+head ncbi_taxonomy1.txt
+head ncbi_taxonomy_species.txt #species with “_”
+paste ncbi_taxonomy1.txt ncbi_taxonomy_species.txt > ncbi_taxonomy.txt
+head ncbi_taxonomy.txt
+
+#### results /lustre/bin/HumanMycobiomeScan/ncbi_taxonomy.txt
+1. tax_id; 2. superkindom; 3. phylim; 4. class; 5. order; 6. family; 7. genus; 8, species.
+
+#$HMS_path/HMS/hms.sh 
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/:$PATH
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/tools:$PATH
+
+#EXAMPLES OF USAGE
+#input，srprism use the version below /lustre/bin/HumanMycobiomeScan/HMS/tools
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/:$PATH
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/tools:$PATH
+
+cd /lustre/bin/HumanMycobiomeScan/
+hms.sh -1 /lustre/bin/HumanMycobiomeScan/Trainning_data/Mock_diff_rab_1.fastq.gz -m /lustre/bin/HumanMycobiomeScan/ -d fungi_LITE -p 1 -o output
+normalising_results.sh -t /lustre/bin/HumanMycobiomeScan/output -m /lustre/bin/HumanMycobiomeScan/
+
+
+######example 1: run negative control
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/:$PATH
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/tools:$PATH
+
+cd /lustre/projects/nc/
+parallel -j 2 'hms.sh -1 {} -m /lustre/bin/HumanMycobiomeScan/ -d fungi_LITE -p 2 -o {}.output' ::: *.fastq
+parallel -j 2 'normalising_results.sh -t /lustre/projects/nc/{} -m /lustre/bin/HumanMycobiomeScan/' ::: *.output
+
+######example 2: run mock1
+cd  /lustre/projects/nc
+perl /lustre/bin/microbiome_helper_master/fasta_to_fastq.pl mock1-reads.fa > mock1_reads.fq
+
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/:$PATH
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/tools:$PATH
+cd /lustre/projects/nc/
+hms.sh -1 mock1_reads.fq -m /lustre/bin/HumanMycobiomeScan/ -d fungi_LITE -p 30 -o mock1_fen_reads.output
+#One sample takes 10G RAM,10G ram, 20MINS/sample
+normalising_results.sh -t /lustre/projects/nc/mock1_fen_reads.output -m /lustre/bin/HumanMycobiomeScan/
+
+####example 3: : run MOCK community
+cd /lustre/projects/nc/
+for f in *.fa ; do perl /lustre/bin/microbiome_helper_master/fasta_to_fastq.pl $f > $f.conv.fq ; done
+
+cd  /lustre/projects/nc
+nano fungi_hms.sh.sh
+
+#!/bin/bash 
+#SBATCH --mem=150gb                     # Job memory request
+#SBATCH --mail-type=END,FAIL            # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=ouczt@163.com
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/:$PATH
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/tools:$PATH
+cd /lustre/projects/nc/
+parallel -j 4 'hms.sh -1 {} -m /lustre/bin/HumanMycobiomeScan/ -d fungi_LITE -p 30 -o {}.output' ::: *.conv.fq 
+parallel -j 4 'normalising_results.sh -t /lustre/projects/nc/{} -m /lustre/bin/HumanMycobiomeScan/' ::: *.output
+
+cd  /lustre/projects/nc
+sbatch -c 30 -o fungi_hms.sh.log -e fungi_hms.sh.err -N 1 fungi_hms.sh.sh
+##4 samples, USING all threads, 
+
+
+######example 4: run fen's GVhD
+cd  /lustre/projects/nc
+nano fungi_hms.sh
+
+#!/bin/bash 
+#SBATCH --mem=150gb                     # Job memory request
+#SBATCH --mail-type=END,FAIL            # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=ouczt@163.com
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/:$PATH
+export PATH=/lustre/bin/HumanMycobiomeScan/HMS/tools:$PATH
+cd /lustre/projects/nc/gvhd-bacteria
+parallel -j 8 'hms.sh -1 {} -m /lustre/bin/HumanMycobiomeScan/ -d fungi_LITE -p 30 -o {}.output' ::: *_R1.fq.gz
+parallel -j 8 'normalising_results.sh -t /lustre/projects/nc/gvhd-bacteria/{} -m /lustre/bin/HumanMycobiomeScan/' ::: *.output
+
+cd  /lustre/projects/nc
+sbatch -c 30 -o fungi_hms.log -e fungi_hms.err -N 1 fungi_hms.sh
+##8 samples use 20G RAM, 20MIN/ROUND
+
+
+###########downstream merge data
+mkdir /lustre/projects/nc/species_RA_combine
+
+cd  /lustre/projects/nc/gvhd-bacteria/
+for file in $(ls|grep .output);
+do
+cd ./$file/Normalised_results
+mv Species_level_normal-%.txt ${file}_species_RA.txt
+cp ${file}_species_RA.txt /lustre/projects/nc/species_RA_combine
+cd /lustre/projects/nc/gvhd-bacteria/
+done
+
+cd /lustre/projects/nc/species_RA_combine
+ls
+rename _R1.fq.gz.output_species_RA.txt _species_RA.txt *_R1.fq.gz.output_species_RA.txt
+rename .fastq.output_species_RA.txt _species_RA.txt *.fastq.output_species_RA.txt
+
+##fetch column 1
+cd /lustre/projects/nc/
+mkdir species_master_list
+
+cd /lustre/projects/nc/species_RA_combine
+for file in $(ls ./);
+do
+cut -f 1 $file > /lustre/projects/nc/species_master_list/${file}_speices_name.txt
+done
+
+cd /lustre/projects/nc/species_master_list/
+cat *_speices_name.txt > speices_name_merge.txt
+
+cat speices_name_merge.txt | sort | uniq | sed '1 s/^/species\n/'> speices_name_merge_unique.txt
+wc -l speices_name_merge_unique.txt #46
+
+##prepare to merge all samples
+cd /lustre/projects/nc/species_RA_combine
+for file in $(ls ./); do
+ NAME=$(echo ${file})
+ echo Name is $NAME
+ sed "1 s/^/species\t${NAME}\n/" ${file} > /lustre/projects/nc/species_master_list/${file}_sampleid_added.txt
+done
+
+cd /lustre/projects/nc/species_master_list/
+cut -f 2 30_species_RA.txt_sampleid_added.txt
+
+
+# Merge the sample hit files to the master contig list
+# After this runs, all of the resulting files should have the same number of lines because they were all merged with the same master list
+cd /lustre/projects/nc/species_master_list/
+mkdir ./RA_on_master_list
+
+cd /lustre/projects/nc/species_master_list/
+for file in $(ls|grep sampleid_added.txt); do
+    awk 'FNR==NR {a[$1]=$2;next}{ print $1"\t"a[$1] }' ${file} ./speices_name_merge_unique.txt  > ./RA_on_master_list/${file}
+done
+
+cd /lustre/projects/nc/species_master_list/RA_on_master_list/
+ls
+
+# Get only RA values so that they can be merged to the master SPECIES list and used for distance matrix calculations
+cd /lustre/projects/nc/species_master_list/
+mkdir ./RA_for_merge
+for file in $(ls ./RA_on_master_list); do
+    cut -f 2 ./RA_on_master_list/$file > ./RA_for_merge/${file}
+done
+
+# Merge the abundances with the contig names
+cd /lustre/projects/nc/species_master_list/
+paste ./speices_name_merge_unique.txt ./RA_for_merge/* | sed '2d' | sed 's/\_species\_RA\.txt//g' > /lustre/projects/nc/species_abundance_all.txt
+#remove blank
+cd /lustre/projects/nc/
+awk 'BEGIN { FS = OFS = "\t" } { for(i=1; i<=NF; i++) if($i ~ /^ *$/) $i = 0 }; 1' species_abundance_all.txt > species_abundance_all2.txt
+#replace all missing values with zero
+
+######results
+cd /lustre/projects/nc/
+head species_abundance_all2.txt
+cut -f 2 species_abundance_all2.txt
+cat species_abundance_all2.txt | awk '{print NF}'
+#check line number
+
+
+#####prepare to add taxonomic lineage to each species
+/lustre/bin/HumanMycobiomeScan/ncbi_taxonomy.txt
+1. tax_id; 2. superkindom; 3. phylum; 4. class; 5. order; 6. family; 7. genus; 8, species.
+
+cd /lustre/projects/nc/
+cut -f 1 species_abundance_all2.txt | sed "s/\"//g" | sed "s/\;/\t/g" | cut -f 2,3 | sed "s/\t/_/g"> sample_species_list.txt
+cut -f 1 species_abundance_all2.txt | sed "s/\"//g" | sed "s/\;/\t/g" | cut -f 1 | sed "s/species/family/" > sample_family_list.txt
+head sample_species_list.txt #species名字中间有个“_”
+head sample_family_list.txt #species名字中间有个“_”
+paste sample_family_list.txt sample_species_list.txt > sample_species_master_list.txt
+
+awk 'FNR==NR {a[$6]=$1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8; next } { print $2"\t"$1"\t"a[$1] }' /lustre/bin/HumanMycobiomeScan/ncbi_taxonomy.txt sample_species_master_list.txt > species_reference_table.txt
+
+
+##Download to the local and do as follows：
+1. Fill the blank with the corresponding linage: such as Zygosaccharomyces_parabailii
+ZygoSaccharomycetaceae
+Eukaryota Ascomycota
+Saccharomycetes  Saccharomycetales Saccharomycetaceae
+Zygosaccharomyces
+2.Multicellular_Multicellular：unclassified;unclassified;unclassified;unclassified;unclassified;unclassified;
+3. remove last line of species
+# 1.species  2.family 3.tax_id
+4.superkingdom  5.phylum 6.class
+order 7.family
+8.genus
+#save as species_reference_table2.txt
+
+#downloaded /lustre/projects/nc/species_abundance_all2.txt and species_reference_table2.txt，get species_abundance_all_final.txt
+
+*************get abundance tables in R************
+setwd("/Volumes/pipline/HumanMycobiomeScan")
+df <- read.table("species_abundance_all_final.txt",sep="\t",head=T)
+head(df)
+#species family superkingdom phylum class order family.1         genus sample 1  sample2 .....
+ncol(df) #38
+df_phylum<-df[,c(4,9:38)] 
+library("plyr")
+df_phylum2<- ddply(df_phylum, "phylum", numcolwise(sum))
+write.table(df_phylum2,"fungi_phylum.txt",sep="\t")
+
+df_family<-df[,c(2,9:38)] 
+library("plyr")
+df_family2<- ddply(df_family, "family", numcolwise(sum))
+write.table(df_family2,"fungi_family.txt",sep="\t")
+
+
+df_genus<-df[,c(8,9:38)] 
+library("plyr")
+df_genus2<- ddply(df_genus, "genus", numcolwise(sum))
+write.table(df_genus2,"fungi_genus.txt",sep="\t")   
+
+##add p__,c__,o__....
+df$phylum<-paste0("p__", df$phylum)
+df$class<-paste0("c__", df$class)
+df$order<-paste0("o__", df$order)
+df$family<-paste0("f__", df$family)
+df$genus<-paste0("g__", df$genus)
+df$species<-paste0("s__", df$species)
+df$kingdom<-rep("k__fungi",nrow(df))
+
+df_metaphlan2_structure<-cbind(df$kingdom,df$phylum,df$class,df$order,df$family,df$genus,df$species)
+head(df_metaphlan2_structure)
+write.csv(df_metaphlan2_structure,"df_metaphlan2_structure.csv")
+
+
