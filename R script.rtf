@@ -1,1035 +1,795 @@
-{\rtf1\ansi\ansicpg936\cocoartf2709
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Roman;\f1\froman\fcharset0 Times-Bold;\f2\fnil\fcharset0 Tahoma;
-\f3\fmodern\fcharset0 Courier-BoldOblique;\f4\fmodern\fcharset0 Courier-Bold;\f5\fnil\fcharset134 STSongti-SC-Regular;
-\f6\fmodern\fcharset0 Courier;\f7\fmodern\fcharset0 CourierNewPSMT;}
-{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red77\green77\blue77;\red127\green127\blue127;
-\red71\green71\blue71;\red0\green0\blue0;\red49\green49\blue49;\red255\green255\blue255;\red38\green38\blue38;
-\red81\green81\blue81;\red79\green143\blue160;\red245\green245\blue245;\red50\green91\blue142;\red12\green95\blue24;
-\red83\green83\blue83;\red53\green145\blue93;\red43\green43\blue43;\red85\green98\blue116;\red0\green0\blue233;
-}
-{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\csgray\c37475;\cssrgb\c57046\c57047\c57046;
-\cssrgb\c34902\c34902\c34902;\csgray\c0\c0;\cssrgb\c25098\c25098\c25098;\cssrgb\c100000\c100000\c100000;\cssrgb\c20000\c20000\c20000;
-\cssrgb\c39216\c39216\c39216;\cssrgb\c37647\c62745\c69020;\cssrgb\c96863\c96863\c96863;\cssrgb\c25098\c43922\c62745;\cssrgb\c0\c43922\c12549;
-\cssrgb\c40000\c40000\c40000;\cssrgb\c25098\c62745\c43922;\cssrgb\c22353\c22353\c22353;\cssrgb\c40784\c46275\c52941;\cssrgb\c0\c0\c93333;
-}
-\paperw11900\paperh16840\margl1440\margr1440\vieww26480\viewh12880\viewkind0
-\deftab720
-\pard\pardeftab720\partightenfactor0
-
-\f0\fs28 \cf0 \expnd0\expndtw0\kerning0
-\
-#importing RPKM table into R.\
-\pard\pardeftab720\partightenfactor0
-
-\f1\b\fs64 \cf0 #RPKM into relative abundance
-\f0\b0\fs28 \
-km_hk_species_all_species2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/km_hk_species_all_species2.csv",row.names=1,header=T)\
- km_hk_norm <-t(t(km_hk_species_all_species2)/colSums(km_hk_species_all_species2,na=T))*100\
- write.table(km_norm, file="C:/users/dell/documents/r/km/km_norm.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\pard\pardeftab720\partightenfactor0
-
-\f1\b\fs36 \cf3 \
 #Normarlization
-\f0\b0\fs28 \cf0 \
-\pard\pardeftab720\partightenfactor0
-\cf0 BiocManager::install("scone")\
-library("zCompositions")\
-\pard\pardeftab720\partightenfactor0
-\cf0 \outl0\strokewidth0 \strokec2 library("microbiome")\
-\pard\pardeftab720\partightenfactor0
+BiocManager::install("scone")
+library("zCompositions")
+library("microbiome")
+#clr
+km_hk_merged_abundance_table_species_z<-cmultRepl((km_hk_merged_abundance_table_species),method="CZM")
+ write.table(km_hk_merged_abundance_table_species_z, file="clr/km_hk_HMS_species_z_clr.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+library(scone)
+ km_hk_HMS_species_z <- as.matrix(read.csv("D:/phd/fungi analysis/HMS/hui's results/results/clr/km_hk_HMS_species_z.csv",row.names=1,header=T))
+ km_hk_HMS_species_z_clr<-CLR_FN(km_hk_HMS_species_z)
+ write.table(km_hk_HMS_species_z_clr, file="clr/km_hk_HMS_species_z_clr.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-\f1\b \cf0 \outl0\strokewidth0 #clr
-\f0\b0 \
-km_hk_merged_abundance_table_species_z<-cmultRepl((km_hk_merged_abundance_table_species),method="CZM")\
- write.table(km_hk_merged_abundance_table_species_z, file="clr/km_hk_HMS_species_z_clr.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-library(scone)\
- km_hk_HMS_species_z <- as.matrix(read.csv("D:/phd/fungi analysis/HMS/hui's results/results/clr/km_hk_HMS_species_z.csv",row.names=1,header=T))\
- km_hk_HMS_species_z_clr<-CLR_FN(km_hk_HMS_species_z)\
- write.table(km_hk_HMS_species_z_clr, file="clr/km_hk_HMS_species_z_clr.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\pard\pardeftab720\partightenfactor0
-\cf0 \
-#
-\f1\b\fs36 \cf4 Alpha-diversity
-\f0\b0\fs28 \cf0 \
-km_hk_norm_t<t(km_hk_norm)\
-shannon<- diversity(species_abund4,index="shannon")\
-simpson<- diversity(species_abund4,index="simpson")\
-chao1<-estimateR(species_abund4[,2])\
-\pard\pardeftab720\partightenfactor0
+#Alpha-diversity
+km_hk_norm_t<t(km_hk_norm)
+shannon<- diversity(species_abund4,index="shannon")
+simpson<- diversity(species_abund4,index="simpson")
+chao1<-estimateR(species_abund4[,2])
 
-\f1\b\fs36 \cf5 \
 #EVENNESS
-\f0\b0\fs28 \cf0 \
- shannon.wiener<-diversity(species_abund3,"shannon")\
- S<-specnumber(species_abund3)\
- J<-shannon.wiener/log(S)\
- write.table(J, file="C:/users/dell/documents/r/J.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
+ shannon.wiener<-diversity(species_abund3,"shannon")
+ S<-specnumber(species_abund3)
+ J<-shannon.wiener/log(S)
+ write.table(J, file="C:/users/dell/documents/r/J.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-\f1\b\fs36 \cf5 \
 #Simpson+Shannon
-\f0\b0\fs28 \cf0 \
-library("ggplot2")\
-library("ggpubr")\
-library(vegan)\
- View(species_abund2)\
- species_abund2 <- read.csv("~/R/species_abund2.csv", header=TRUE,row.names = 1)\
- View(species_abund2)\
- species_abund3<-species_abund2[1:466,1:99]\
- species_abund4<-t(species_abund3)\
- shannon<- diversity(species_abund4,index="shannon")\
- simpson<- diversity(species_abund4,index="simpson")\
-result<-data.frame(shannon,simpson)\
- write.table(shannon, file="tao's results/diversity/hk_HMS_fungi_species_shannon.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
+library("ggplot2")
+library("ggpubr")
+library(vegan)
+ View(species_abund2)
+ species_abund2 <- read.csv("~/R/species_abund2.csv", header=TRUE,row.names = 1)
+ View(species_abund2)
+ species_abund3<-species_abund2[1:466,1:99]
+ species_abund4<-t(species_abund3)
+ shannon<- diversity(species_abund4,index="shannon")
+ simpson<- diversity(species_abund4,index="simpson")
+result<-data.frame(shannon,simpson)
+ write.table(shannon, file="tao's results/diversity/hk_HMS_fungi_species_shannon.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-\f1\b\fs36 \cf5 \
 #Chao1
-\f0\b0\fs28 \cf0 \
-\
-hk_km_norm4 <- read.csv("~/R/km/km2/km_norm4.csv",header=TRUE,row.names=1)\
- hk_km_chao1<-estimateR(km_norm4[1:99,])\
-write.table(chao1, file="C:/users/dell/documents/r/hk/chao1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\pard\pardeftab720\partightenfactor0
-\cf0 \cb2 \
-\pard\pardeftab720\partightenfactor0
+hk_km_norm4 <- read.csv("~/R/km/km2/km_norm4.csv",header=TRUE,row.names=1)
+hk_km_chao1<-estimateR(km_norm4[1:99,])
+write.table(chao1, file="C:/users/dell/documents/r/hk/chao1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-\fs32 \cf2 \cb6 library("ggsci")
-\fs28 \cb6 \
+library("ggsci")
+library("ggplot2")
+library("gridExtra")
+library("ggpubr")
 
-\fs32 \cb6 library("ggplot2")
-\fs28 \cb6 \
+#ploting
 
-\fs32 \cb6 library("gridExtra")
-\fs28 \cb6 \
-
-\fs32 \cb6 library("ggpubr")\cf7 \cb8 \
-\pard\pardeftab720\partightenfactor0
-
-\fs28 \cf0 \cb1 \
-\pard\pardeftab720\partightenfactor0
-
-\f1\b\fs36 \cf0 #ploting
-\f0\b0\fs28 \
-\pard\pardeftab720\partightenfactor0
-
-\f1\b \cf0 \
 #shannon
-\f0\b0 \
-my_comparison<-list(c("hk_lean","hk_obese"),c("km_lean","km_obese"),c("hk_obese","km_obese"),c("hk_lean","km_lean"))\
-ggboxplot(diversity,x="groups",y="shannon",add="jitter",ylabs="Shannon",color="groups")+labs(y="Shannon",x=NULL)+stat_compare_means(method="anova",label.y=3.5,size=3.5)+stat_compare_means(method="t.test", aes(label="p.signif"),bracket.size =0.6, size = 8,label.y=3.5,ref.group = "all")\
-+geom_signif(comparisons = my_comparisons,step_increase=0.3,map_signif_level = F)\
-+border("black")+theme(axis.title.x = element_text(size = 16,face = "plain",color = "black"), axis.title.y = element_text(size = 16,face = "plain",color = "black"), axis.text = element_text(size = 16,face = "plain",color = "black"), legend.position = "none", legend.title = element_text(), legend.text = element_text(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size = 1.2),panel.background = element_blank())+scale_color_jco()\
-  ggboxplot(shannon,x="Region",y="Shannon",add="jitter",color="Obesity_type")+labs(y="Shannon",x=NULL)+theme(axis.title.x = element_text(size = 16,face = "plain",color = "black"), axis.title.y = element_text(size = 16,face = "plain",color = "black"), axis.text = element_text(size = 16,face = "plain",color = "black"),legend.title = element_text(), legend.text = element_text(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size = 1.2),panel.background = element_blank())+scale_color_jco()+border("black")+ylim(0,4)+geom_signif(comparisons = my_comparisons,y_position=3.8,map_signif_level = F)+stat_compare_means(aes(group = Obesity_type),label.y= 3.5, label = "p.format")\
+my_comparison<-list(c("hk_lean","hk_obese"),c("km_lean","km_obese"),c("hk_obese","km_obese"),c("hk_lean","km_lean"))
+ggboxplot(diversity,x="groups",y="shannon",add="jitter",ylabs="Shannon",color="groups")+labs(y="Shannon",x=NULL)+stat_compare_means(method="anova",label.y=3.5,size=3.5)+stat_compare_means(method="t.test", aes(label="p.signif"),bracket.size =0.6, size = 8,label.y=3.5,ref.group = "all")
++geom_signif(comparisons = my_comparisons,step_increase=0.3,map_signif_level = F)
++border("black")+theme(axis.title.x = element_text(size = 16,face = "plain",color = "black"), axis.title.y = element_text(size = 16,face = "plain",color = "black"), axis.text = element_text(size = 16,face = "plain",color = "black"), legend.position = "none", legend.title = element_text(), legend.text = element_text(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size = 1.2),panel.background = element_blank())+scale_color_jco()
+  ggboxplot(shannon,x="Region",y="Shannon",add="jitter",color="Obesity_type")+labs(y="Shannon",x=NULL)+theme(axis.title.x = element_text(size = 16,face = "plain",color = "black"), axis.title.y = element_text(size = 16,face = "plain",color = "black"), axis.text = element_text(size = 16,face = "plain",color = "black"),legend.title = element_text(), legend.text = element_text(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size = 1.2),panel.background = element_blank())+scale_color_jco()+border("black")+ylim(0,4)+geom_signif(comparisons = my_comparisons,y_position=3.8,map_signif_level = F)+stat_compare_means(aes(group = Obesity_type),label.y= 3.5, label = "p.format")
 
-\f1\b \
 #simpson
-\f0\b0 \
-ggboxplot(diversity,x="groups",y="simpson",add="jitter",color="groups")+labs(y="Simpson",x=NULL)+stat_compare_means(method="anova",label.y=1.3,size=3.5)+stat_compare_means(method="t.test", label="p.signif",label.y=1, ref.group = ".all.",hide.ns = TRUE)+geom_signif(comparisons = my_comparisons,step_increase=0.3,map_signif_level = F)+border("black")+theme(axis.title.x = element_text(size = 16,face = "plain",color = "black"), axis.title.y = element_text(size = 16,face = "plain",color = "black"), axis.text = element_text(size = 16,face = "plain",color = "black"), legend.position = "none", legend.title = element_text(), legend.text = element_text(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size = 1.2),panel.background = element_blank())+scale_color_jco() \
- my_comparisons<-list(c("Hongkong","Kunming"))\
-ggboxplot(simpson,x="Region",y="simpson",add="jitter",color="obesity",palette = "lancet")+labs(y="Diversity",x=NULL)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position ="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+ylim(0,1.5)+geom_signif(comparison = my_comparison,y_position=1.4,map_signif_level = F,family = "Arial",colour="black",textface="bold",textsize=6)+stat_compare_means(aes(group = obesity,label=..p.format..,test="wilcox.test"),label.y= 1.2,family = "Arial",colour="black",face="bold",size=6)+scale_x_discrete(breaks=c("Hongkong","Kunming"),labels=c("HK","KM"))\
+ggboxplot(diversity,x="groups",y="simpson",add="jitter",color="groups")+labs(y="Simpson",x=NULL)+stat_compare_means(method="anova",label.y=1.3,size=3.5)+stat_compare_means(method="t.test", label="p.signif",label.y=1, ref.group = ".all.",hide.ns = TRUE)+geom_signif(comparisons = my_comparisons,step_increase=0.3,map_signif_level = F)+border("black")+theme(axis.title.x = element_text(size = 16,face = "plain",color = "black"), axis.title.y = element_text(size = 16,face = "plain",color = "black"), axis.text = element_text(size = 16,face = "plain",color = "black"), legend.position = "none", legend.title = element_text(), legend.text = element_text(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size = 1.2),panel.background = element_blank())+scale_color_jco() 
+ my_comparisons<-list(c("Hongkong","Kunming"))
+ggboxplot(simpson,x="Region",y="simpson",add="jitter",color="obesity",palette = "lancet")+labs(y="Diversity",x=NULL)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position ="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+ylim(0,1.5)+geom_signif(comparison = my_comparison,y_position=1.4,map_signif_level = F,family = "Arial",colour="black",textface="bold",textsize=6)+stat_compare_means(aes(group = obesity,label=..p.format..,test="wilcox.test"),label.y= 1.2,family = "Arial",colour="black",face="bold",size=6)+scale_x_discrete(breaks=c("Hongkong","Kunming"),labels=c("HK","KM"))
 
-\f1\b \
 #evenness
-\f0\b0 \
-ggboxplot(diversity,x="groups",y="evenness",add="jitter",color="groups")+labs(y="Evenness",x=NULL)+stat_compare_means(method="anova",label.y=1.3,size=3.5)+stat_compare_means(method="t.test", label="p.signif",label.y=1.1, ref.group = ".all.",hide.ns = TRUE)+geom_signif(comparisons = my_comparisons,step_increase=0.3,map_signif_level = F)+border("black")+theme(axis.title.x = element_text(size = 16,face = "plain",color = "black"), axis.title.y = element_text(size = 16,face = "plain",color = "black"), axis.text = element_text(size = 16,face = "plain",color = "black"), legend.position = "none", legend.title = element_text(), legend.text = element_text(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size = 1.2),panel.background = element_blank())+scale_color_jco()\
-\
-ggboxplot(evenness,x="Region",y="evenness",add="jitter",color="Obesity_type",palette = "lancet")+labs(y="Evenness",x=NULL)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position ="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+ylim(0,1.5)+geom_signif(comparison = my_comparison,y_position=1.4,map_signif_level = F,family = "Arial",colour="black",textface="bold",textsize=6)+stat_compare_means(aes(group = Obesity_type,label=..p.format..),label.y= 1.2,family = "Arial",colour="black",face="bold",size=6)+scale_x_discrete(breaks=c("Hongkong","Kunming"),labels=c("HK","KM"))\
+ggboxplot(diversity,x="groups",y="evenness",add="jitter",color="groups")+labs(y="Evenness",x=NULL)+stat_compare_means(method="anova",label.y=1.3,size=3.5)+stat_compare_means(method="t.test", label="p.signif",label.y=1.1, ref.group = ".all.",hide.ns = TRUE)+geom_signif(comparisons = my_comparisons,step_increase=0.3,map_signif_level = F)+border("black")+theme(axis.title.x = element_text(size = 16,face = "plain",color = "black"), axis.title.y = element_text(size = 16,face = "plain",color = "black"), axis.text = element_text(size = 16,face = "plain",color = "black"), legend.position = "none", legend.title = element_text(), legend.text = element_text(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size = 1.2),panel.background = element_blank())+scale_color_jco()
 
-\f1\b \
+ggboxplot(evenness,x="Region",y="evenness",add="jitter",color="Obesity_type",palette = "lancet")+labs(y="Evenness",x=NULL)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position ="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+ylim(0,1.5)+geom_signif(comparison = my_comparison,y_position=1.4,map_signif_level = F,family = "Arial",colour="black",textface="bold",textsize=6)+stat_compare_means(aes(group = Obesity_type,label=..p.format..),label.y= 1.2,family = "Arial",colour="black",face="bold",size=6)+scale_x_discrete(breaks=c("Hongkong","Kunming"),labels=c("HK","KM"))
+
 #chao1
-\f0\b0 \
-  ggboxplot(diversity,x="obesity",y="S.chao1",add="jitter",palette = "lancet",color="obesity")+labs(y="Chao1",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=35,label.x=1.4,family = "Arial",colour="black",face="bold",size=6,label.y=60)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))\
-\
-my_comparison<-list(c("Hongkong","Kunming"))\
-ggboxplot(richness,x="Region",y="S.chao1",add="jitter",color="Obesity_type",palette = "lancet")+labs(y="Richness",x=NULL)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+ylim(0,60)+geom_signif(comparisons = my_comparison,y_position=57,map_signif_level = F,label.y=50,label.x=1.4,family = "Arial",colour="black",textface="bold",textsize=6)+stat_compare_means(aes(group = Obesity_type,label=..p.format..),label.y= 50,family = "Arial",colour="black",face="bold",size=6)+scale_x_discrete(breaks=c("Hongkong","Kunming"),labels=c("HK","KM"))\
-\
-\pard\pardeftab720\partightenfactor0
+  ggboxplot(diversity,x="obesity",y="S.chao1",add="jitter",palette = "lancet",color="obesity")+labs(y="Chao1",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=35,label.x=1.4,family = "Arial",colour="black",face="bold",size=6,label.y=60)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))
 
-\f1\b\fs64 \cf0 #Stark chart
-\f0\b0\fs28 \
-\
-km_hk_species_all_genus_norm_top10_t <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/km_hk/genus/km_hk_species_all_genus_norm_top10_t.csv",header=T)\
- df.long <- melt(km_hk_species_all_genus_norm_top10_t, id.vars=c("id","region","obesity"), measure.vars=grep("g_", names(km_hk_species_all_genus_norm_top10_t), val=T),variable.name="genus",value.name="value")\
- library("reshape2")\
- df.long <- melt(km_hk_species_all_genus_norm_top10_t, id.vars=c("id","region","obesity"), measure.vars=grep("g_", names(km_hk_species_all_genus_norm_top10_t), val=T),variable.name="genus",value.name="value")\
- write.table(df.long,file="D:/phd/fungi analysis/HMS/hui's results/results/km_hk/df.long.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- df.long <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/km_hk/df.long.csv")\
-   View(df.long)\
- df.long <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/km_hk/df.long.csv",row.names=1,header=T)\
- ggplot(df.long,aes(x=id,y=value,fill=genus))+geom_col(position = "fill",width=0.6)+labs(y="Relative abundance(%)")+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14),axis.text.x = element_blank(),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),axis.title.x = element_blank(),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+facet_grid(region~obesity)\
- library(RColorBrewer)\
- getPalette <- colorRampPalette(brewer.pal(10, "Set1"))\
- colourCount <- length(unique(df.long$genus)) # number of levels\
-\
-ggplot(df.long,aes(x=id,y=value,fill=genus))+geom_col(position = "fill",width=1)+labs(y="Relative abundance(%)")+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14),axis.text.x = element_blank(),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),axis.title.x = element_blank(),legend.position = "right",legend.title = element_text(family="Arial",colour="black",face="bold",size=16),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5),strip.text = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))+facet_grid(region~obesity)+scale_fill_manual(name="Genus",labels=c("Saccharomyces","Anomalomyces","Nakaseomyces","Talaromyces","Schizosaccharomyces","Rhodotorula","Longitudinalis","Pichia","Botrytis","Trichoderma"),values = getPalette(colourCount))\
-\
-\pard\pardeftab720\partightenfactor0
+my_comparison<-list(c("Hongkong","Kunming"))
+ggboxplot(richness,x="Region",y="S.chao1",add="jitter",color="Obesity_type",palette = "lancet")+labs(y="Richness",x=NULL)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+ylim(0,60)+geom_signif(comparisons = my_comparison,y_position=57,map_signif_level = F,label.y=50,label.x=1.4,family = "Arial",colour="black",textface="bold",textsize=6)+stat_compare_means(aes(group = Obesity_type,label=..p.format..),label.y= 50,family = "Arial",colour="black",face="bold",size=6)+scale_x_discrete(breaks=c("Hongkong","Kunming"),labels=c("HK","KM"))
 
-\f1\b\fs36 \cf0 #\cf2 Host Factors Associated with Gut Mycobiome Variation\
-\pard\pardeftab720\partightenfactor0
+#Stark chart
 
-\f0\b0\fs28 \cf0 library(vegan)\
-adonis_obesity_type<-adonis(tao_hms_species_norm2_NMDS[,6:60]~Obesity_type,data = tao_hms_species_norm2_NMDS,permutations = 9999,method="bray")\
-adonis\
-adonis$aov.tab\
- write.table(adonis2$aov.tab,file="pca/adonis2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\
- ggplot(permanova, mapping = aes(x = reorder(factor, R2), y = R2, fill = factor)) + geom_bar(stat = "identity", width = 0.5)+coord_flip()+ylim(0, max(permanova$R2)*1.2)+geom_text(aes(label = sig, size=14,face="bold",vjust = 0.5, hjust = -0.5))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.line = element_line(), axis.text.x = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.title.x = element_text(face = "bold", size = 18, family="Arial",colour = "black"), axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.spacing.x = unit(0.15, "line"), legend.position ="none", panel.background = element_blank(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2), plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+labs(y="Effect size",x=NULL)+scale_colour_brewer(palette="Reds")\
-\
-\pard\pardeftab720\partightenfactor0
+km_hk_species_all_genus_norm_top10_t <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/km_hk/genus/km_hk_species_all_genus_norm_top10_t.csv",header=T)
+ df.long <- melt(km_hk_species_all_genus_norm_top10_t, id.vars=c("id","region","obesity"), measure.vars=grep("g_", names(km_hk_species_all_genus_norm_top10_t), val=T),variable.name="genus",value.name="value")
+ library("reshape2")
+ df.long <- melt(km_hk_species_all_genus_norm_top10_t, id.vars=c("id","region","obesity"), measure.vars=grep("g_", names(km_hk_species_all_genus_norm_top10_t), val=T),variable.name="genus",value.name="value")
+ write.table(df.long,file="D:/phd/fungi analysis/HMS/hui's results/results/km_hk/df.long.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ df.long <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/km_hk/df.long.csv")
+   View(df.long)
+ df.long <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/km_hk/df.long.csv",row.names=1,header=T)
+ ggplot(df.long,aes(x=id,y=value,fill=genus))+geom_col(position = "fill",width=0.6)+labs(y="Relative abundance(%)")+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14),axis.text.x = element_blank(),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),axis.title.x = element_blank(),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+facet_grid(region~obesity)
+ library(RColorBrewer)
+ getPalette <- colorRampPalette(brewer.pal(10, "Set1"))
+ colourCount <- length(unique(df.long$genus)) # number of levels
 
-\f1\b\fs40 \cf0 \
+ggplot(df.long,aes(x=id,y=value,fill=genus))+geom_col(position = "fill",width=1)+labs(y="Relative abundance(%)")+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14),axis.text.x = element_blank(),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),axis.title.x = element_blank(),legend.position = "right",legend.title = element_text(family="Arial",colour="black",face="bold",size=16),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5),strip.text = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))+facet_grid(region~obesity)+scale_fill_manual(name="Genus",labels=c("Saccharomyces","Anomalomyces","Nakaseomyces","Talaromyces","Schizosaccharomyces","Rhodotorula","Longitudinalis","Pichia","Botrytis","Trichoderma"),values = getPalette(colourCount))
+
+#Host Factors Associated with Gut Mycobiome Variation
+library(vegan)
+adonis_obesity_type<-adonis(tao_hms_species_norm2_NMDS[,6:60]~Obesity_type,data = tao_hms_species_norm2_NMDS,permutations = 9999,method="bray")
+adonis
+adonis$aov.tab
+ write.table(adonis2$aov.tab,file="pca/adonis2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+
+ ggplot(permanova, mapping = aes(x = reorder(factor, R2), y = R2, fill = factor)) + geom_bar(stat = "identity", width = 0.5)+coord_flip()+ylim(0, max(permanova$R2)*1.2)+geom_text(aes(label = sig, size=14,face="bold",vjust = 0.5, hjust = -0.5))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.line = element_line(), axis.text.x = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.title.x = element_text(face = "bold", size = 18, family="Arial",colour = "black"), axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.spacing.x = unit(0.15, "line"), legend.position ="none", panel.background = element_blank(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2), plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+labs(y="Effect size",x=NULL)+scale_colour_brewer(palette="Reds")
+
+
 #NMSD
-\f0\b0\fs28 \
-\
- km_species_abund2 <- read.csv("~/R/km/species_abund2.csv",row.names=1,sep=",",stringsAsFactors = FALSE, check.names=FALSE)\
- km_species_abund3<-data.frame(t(species_abund2))\
- km_nmds1<-metaMDS(species_abund3,distance="bray",k=2)\
-  summary(nmds1)\
- nmds1.stress<-km_nmds1$stress\
- nmds1.point<-data.frame(nmds1$points)\
-nmds1.species<-data.frame(nmds1$species)\
- write.table(nmds1.point,file="C:/users/dell/documents/r/km/pcoa/nmds1_point.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- write.table(km_nmds1.species,file="C:/users/dell/documents/r/km/pcoa/nmds1_species.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- sample_site<-nmds1.point[1:2]\
- sample_site$names<-rownames(sample_site)\
- names(km_sample_site)[1:2]<-c("NMDS1","NMDS2")\
- groups <- read.csv("~/R/km/nmds/groups.csv",sep=",",stringsAsFactors = FALSE, check.names=FALSE)\
- sample_site3 <- merge(km_sample_site, km_groups, by = 'names', all.x = TRUE)\
- write.table(sample_site3,file="C:/users/dell/documents/r/km/nmds/sample_site3.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- library(ggplot2)\
-sample_site3 <- read.csv("~/R/hk/nmds/sample_site3.csv",sep=",",stringsAsFactors = FALSE, check.names=FALSE)\
-\
-ggplot(zh_km_HMS_sample_site3,aes(NMDS1,NMDS2,group=groups,color=groups,shape=groups),colour=factor(zh_km_HMS_sample_site3))+geom_point(aes(color = groups, shape = groups), size = 1.5, alpha = 0.8)+scale_shape_manual(values = c(17, 17)) +theme(panel.grid = element_blank(), panel.background = element_rect(color = 'black', fill = 'transparent'))+theme(legend.key = element_rect(fill = 'transparent'), legend.title = element_blank()) +labs(x="NMDS axis1",y="NMDS axis2")+stat_ellipse(level = 0.95, show.legend = TRUE)\
-\pard\pardeftab720\partightenfactor0
 
-\f1\b\fs36 \cf0 \
+ km_species_abund2 <- read.csv("~/R/km/species_abund2.csv",row.names=1,sep=",",stringsAsFactors = FALSE, check.names=FALSE)
+ km_species_abund3<-data.frame(t(species_abund2))
+ km_nmds1<-metaMDS(species_abund3,distance="bray",k=2)
+  summary(nmds1)
+ nmds1.stress<-km_nmds1$stress
+ nmds1.point<-data.frame(nmds1$points)
+nmds1.species<-data.frame(nmds1$species)
+ write.table(nmds1.point,file="C:/users/dell/documents/r/km/pcoa/nmds1_point.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ write.table(km_nmds1.species,file="C:/users/dell/documents/r/km/pcoa/nmds1_species.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ sample_site<-nmds1.point[1:2]
+ sample_site$names<-rownames(sample_site)
+ names(km_sample_site)[1:2]<-c("NMDS1","NMDS2")
+ groups <- read.csv("~/R/km/nmds/groups.csv",sep=",",stringsAsFactors = FALSE, check.names=FALSE)
+ sample_site3 <- merge(km_sample_site, km_groups, by = 'names', all.x = TRUE)
+ write.table(sample_site3,file="C:/users/dell/documents/r/km/nmds/sample_site3.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ library(ggplot2)
+sample_site3 <- read.csv("~/R/hk/nmds/sample_site3.csv",sep=",",stringsAsFactors = FALSE, check.names=FALSE)
+
+ggplot(zh_km_HMS_sample_site3,aes(NMDS1,NMDS2,group=groups,color=groups,shape=groups),colour=factor(zh_km_HMS_sample_site3))+geom_point(aes(color = groups, shape = groups), size = 1.5, alpha = 0.8)+scale_shape_manual(values = c(17, 17)) +theme(panel.grid = element_blank(), panel.background = element_rect(color = 'black', fill = 'transparent'))+theme(legend.key = element_rect(fill = 'transparent'), legend.title = element_blank()) +labs(x="NMDS axis1",y="NMDS axis2")+stat_ellipse(level = 0.95, show.legend = TRUE)
+
 #ploting 
-\f0\b0\fs28 \
-\
-ggplot(km_hk_sample_site_nmds, aes(x = NMDS1, y = NMDS2)) + geom_point(size = 5, aes( colour = factor(Region), shape = factor(Obesity)))+labs(x = "NMDS1", shape = "Obesity", y = "NMDS2", colour = "Region")  + scale_color_jco() + guides(shape=guide_legend("Obesity"), colour=guide_legend("Region"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.title.x = element_text(face = "bold", size = 18, family="Arial",colour = "black"), axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.key=element_blank(), legend.text = element_text(family="Arial",colour="black",size=14), legend.title = element_text(family="Arial",colour="black", face="bold", size=14), legend.direction="horizontal", legend.spacing.x = unit(0.15, "line"), legend.position ="top", legend.background = element_rect(fill="transparent"), legend.margin = margin(0, 0.3,0, 0.3, 'cm'), legend.title.align = 1, panel.background = element_blank(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2))\
-\pard\pardeftab720\partightenfactor0
 
-\f2 \cf2 \cb8 dev.off()
-\f0 \cf0 \cb1 \
- \
-\
-\pard\pardeftab720\partightenfactor0
+ggplot(km_hk_sample_site_nmds, aes(x = NMDS1, y = NMDS2)) + geom_point(size = 5, aes( colour = factor(Region), shape = factor(Obesity)))+labs(x = "NMDS1", shape = "Obesity", y = "NMDS2", colour = "Region")  + scale_color_jco() + guides(shape=guide_legend("Obesity"), colour=guide_legend("Region"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.title.x = element_text(face = "bold", size = 18, family="Arial",colour = "black"), axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.key=element_blank(), legend.text = element_text(family="Arial",colour="black",size=14), legend.title = element_text(family="Arial",colour="black", face="bold", size=14), legend.direction="horizontal", legend.spacing.x = unit(0.15, "line"), legend.position ="top", legend.background = element_rect(fill="transparent"), legend.margin = margin(0, 0.3,0, 0.3, 'cm'), legend.title.align = 1, panel.background = element_blank(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2))
+dev.off()
+ 
 
-\f1\b\fs56 \cf0 #Superheat
-\f0\b0\fs28 \
-\
-#selecting lines that value<0.01\
- myfun<-function(hk_norm)\{sum(hk_norm0.01)\}\
- apply(hk_norm,2,myfun)\
- apply(hk_norm,1,myfun)\
- hk_heatmap1<-hk_norm[as.logical(apply(hk_norm,1,myfun)),]\
- write.table(hk_heatmap1, file="C:/users/dell/documents/r/hk/hk2/heatmap/hk_heatmap1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\
- nn<-216(216 is the number of lines)\
- mm<-0.2\uc0\u65288 selecting the OTU present in 20% samples\u65289 \
- mnn<-nn*mm\
-\pard\pardeftab720\partightenfactor0
+#Superheat
 
-\f1\b\fs34 \cf9  myfun<-function(x)\{sum(x!=0)\}
-\f0\b0\fs28 \cf0 \
- km_heatmap2<-km_genus_norm[(apply(km_genus_norm,1,myfun)=mnn),]\
- write.table(km_heatmap2, file="C:/users/dell/documents/r/km/km2/heatmap/km_heatmap2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\
-\
- setwd ("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS")\
- km_species_otu <- read.csv("~/R/km/km2/histogram/km_species_otu.csv",row.names = 1)\
- groupcc <- ifelse(grepl('Obese',colnames(km_phylum_otu)), 'Obese(n=50)','Lean(n=49)')\
- superheatmap<-superheat (km_supermap2, scale=TRUE, membership.cols=groupcc,  pretty.order.rows=TRUE, left.label.size = 0.35, left.label.text.size = 4.5, left.label.text.alignment = "left",bottom.label.text.size = 9,bottom.label.col = c("Grey", "Grey50"),grid.hline = FALSE,grid.vline = TRUE,grid.vline.col="white",row.dendrogram=TRUE,extreme.values.na = FALSE,legend.vspace = 0.01)\
-\
-matrix<-data.matrix(tao_hms_heatmap)\
-superheat(matrix,scale=TRUE,pretty.order.cols=TRUE,pretty.order.rows = TRUE,heat.lim=c(-1,4),extreme.values.na = FALSE,row.dendrogram=TRUE,grid.hline.col="black",grid.vline="black",grid.hline.size=4,grid.vline.size=4,left.label.size=0.2,left.label.col="white",left.label.text.size=2,bottom.label="none")\
-\
-\
-\pard\pardeftab720\partightenfactor0
+#selecting lines that value<0.01
+ myfun<-function(hk_norm){sum(hk_norm0.01)}
+ apply(hk_norm,2,myfun)
+ apply(hk_norm,1,myfun)
+ hk_heatmap1<-hk_norm[as.logical(apply(hk_norm,1,myfun)),]
+ write.table(hk_heatmap1, file="C:/users/dell/documents/r/hk/hk2/heatmap/hk_heatmap1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-\f1\b\fs48 \cf0 #Heatmap
-\f0\b0\fs28 \
-\
-library(circlize)\
-library(ComplexHeatmap)\
-\pard\pardeftab720\partightenfactor0
-\cf0 \
- myfun<-function(species_norm)\{sum(species_norm0.01)\}\
- apply(hk_norm,2,myfun)\
- apply(hk_norm,1,myfun)\
- heatmap1<-species_norm[as.logical(apply(species_norm,1,myfun)),]\
- write.table(heatmap1, file="C:/users/dell/documents/r/hk/hk2/heatmap/heatmap1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\
- nn<-216(216 is the number of lines)\
- mm<-0.2\uc0\u65288 selecting the OTU present in 20% samples\u65289 \
- mnn<-nn*mm\
-\pard\pardeftab720\partightenfactor0
+ nn<-216(216 is the number of lines)
+ mm<-0.2（selecting the OTU present in 20% samples）
+ mnn<-nn*mm
+ myfun<-function(x){sum(x!=0)}
+ km_heatmap2<-km_genus_norm[(apply(km_genus_norm,1,myfun)=mnn),]
+ write.table(km_heatmap2, file="C:/users/dell/documents/r/km/km2/heatmap/km_heatmap2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-\f1\b\fs34 \cf9  myfun<-function(x)\{sum(x!=0)\}
-\f0\b0\fs28 \cf0 \
- heatmap2<-km_genus_norm[(apply(genus_norm,1,myfun)=mnn),]\
- write.table(heatmap2, file="C:/users/dell/documents/r/km/km2/heatmap/heatmap2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\pard\pardeftab720\partightenfactor0
-\cf0 \
-mycol <- colorRamp2(c(-2, 0, 6), c("blue", "white", "red"))\
-mycol <-  colorRamp2(c(-2, -1, 0, 2), c("blue", "cornflowerblue", "yellow", "gold"))\
-\
-#adding grouping ornament\
- ha<-HeatmapAnnotation(df=data.frame(Obesity_type=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity_type = c("Obese" = "#c53333", "Lean" = "#2d72bf"),Region=c("Hong Kong"="#d87e29","Kunming"="#ad3ab4")),annotation_legend_param = list(title_gp = gpar(fontsize = 10), labels_gp = gpar(fontsize = 10),fontface = "bold"))\
-\
- ha<-HeatmapAnnotation(df=data.frame(Obesity_type=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity_type = c("Obese" = "#c53333", "Lean" = "#2d72bf"),Region=c("Hong Kong"="#FF7F00","Kunming"="#ad3ab4")),annotation_legend_param = list(title_gp = gpar(fontsize = 10), labels_gp = gpar(fontsize = 10),fontface = "bold"))\
-tao_hms_heatmap_plot<-Heatmap(matrix,name="Color key",col=mycol, cluster_columns = FALSE, cluster_rows = FALSE,top_annotation=ha, heatmap_legend_param = list(direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_column_dend =T,show_row_names = TRUE,row_dend_side="left",row_names_gp=gpar(fontsize=7,fontface="italic",fontface="bold"))\
-draw(tao_hms_heatmap_plot, heatmap_legend_side = "bottom", annotation_legend_side = "right") \
- \
-\
-\pard\pardeftab720\partightenfactor0
 
-\f1\b \cf0 #Comparison
-\f0\b0 \
- heatmap3 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/heatmap/heatmap3.csv",header=T)\
-ha<-HeatmapAnnotation(df=data.frame(Obesity_type=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity_type = c("Obese" = "#c53333", "Lean" = "#2d72bf"),Region=c("Hong Kong"="#d87e29","Kunming"="#ad3ab4")),annotation_legend_param = list(title_gp = gpar(fontsize = 10), labels_gp = gpar(fontsize = 10),fontface = "bold"))\
- matrix<-data.matrix(km_hk_heatmap2[,2:218])\
- Heatmap(matrix,name="Color key",col=mycol, cluster_columns = FALSE, cluster_rows = FALSE,top_annotation=ha, heatmap_legend_param = list(direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_column_dend =T,show_row_names = TRUE,row_dend_side="left",row_names_gp=gpar(fontsize=7,fontface="italic",fontface="bold"))\
- km_hk_heatmap_plot<-Heatmap(matrix,name="Color key",col=mycol, cluster_columns = FALSE, cluster_rows = FALSE,top_annotation=ha, heatmap_legend_param = list(direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_column_dend =T,show_row_names = TRUE,row_dend_side="left",row_names_gp=gpar(fontsize=7,fontface="italic",fontface="bold"))\
- draw(km_hk_heatmap_plot, heatmap_legend_side = "bottom", annotation_legend_side = "right") \
-mycol <- colorRamp2(c(0, 0.5, 5), c("#377EB8","white","#E41A1C"))\
-heatmap5 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/heatmap/heatmap5.csv",row.names=1,header=T)\
- matrix<-data.matrix(km_hk_heatmap5[,1:217])\
- library("RColorBrewer")\
- library("circlize")\
- library(ComplexHeatmap)\
- mycol <-  colorRamp2(c(1,2,3,4,5),brewer.pal(5, "RdYlBu")[2:6])\
- split = data.frame(c(rep("HK",118),rep("KM",99)))`\
- ha<-HeatmapAnnotation(df=data.frame(Obesity=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity = c("Obese" = "#FF4500", "Lean" = "#3B4992FF"),Region=c("Hong Kong"="#FFBECD","Kunming"="#91D1C2B2")),annotation_legend_param = list(title_gp = gpar(fontsize = 14,fontface="bold"), labels_gp = gpar(fontsize = 12),width = unit(4, "cm")))\
-\
- km_hk_heatmap_plot<-Heatmap(matrix,name="Color key",col=mycol,column_split = split, column_title=NULL,cluster_columns = FALSE, column_gap = unit(3, "mm"),cluster_rows = T,row_dend_side="left",clustering_distance_columns = "pearson",top_annotation=ha,heatmap_legend_param = list(title="",direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_row_names = TRUE,row_names_gp=gpar(fontsize=8,fontface="italic",fontface="bold"))\
-\
- draw(km_hk_heatmap_plot, heatmap_legend_side = "bottom", annotation_legend_side = "right") \
-\
-\pard\pardeftab720\partightenfactor0
+ setwd ("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS")
+ km_species_otu <- read.csv("~/R/km/km2/histogram/km_species_otu.csv",row.names = 1)
+ groupcc <- ifelse(grepl('Obese',colnames(km_phylum_otu)), 'Obese(n=50)','Lean(n=49)')
+ superheatmap<-superheat (km_supermap2, scale=TRUE, membership.cols=groupcc,  pretty.order.rows=TRUE, left.label.size = 0.35, left.label.text.size = 4.5, left.label.text.alignment = "left",bottom.label.text.size = 9,bottom.label.col = c("Grey", "Grey50"),grid.hline = FALSE,grid.vline = TRUE,grid.vline.col="white",row.dendrogram=TRUE,extreme.values.na = FALSE,legend.vspace = 0.01)
 
-\f1\b\fs56 \cf0 #Lefse
-\f0\b0\fs28 \
- setwd("D:/phd/fungi analysis/HMS/hui's results/results/Lefse")\
- hk_km_biomarker <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker.csv")\
- View(hk_km_biomarker)\
- hk_km_biomarker <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker.csv",header=T)\
- library("reshape2")\
- hk_km_biomarker_melt <- melt(hk_km_biomarker, id.vars=c("id","Region","Obesity"), measure.vars=grep("s_", names(hk_km_biomarker), val=T),variable.name="species",value.name="value")\
- write.table(hk_km_biomarker_melt,file="D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker_melt.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\pard\pardeftab720\partightenfactor0
+matrix<-data.matrix(tao_hms_heatmap)
+superheat(matrix,scale=TRUE,pretty.order.cols=TRUE,pretty.order.rows = TRUE,heat.lim=c(-1,4),extreme.values.na = FALSE,row.dendrogram=TRUE,grid.hline.col="black",grid.vline="black",grid.hline.size=4,grid.vline.size=4,left.label.size=0.2,left.label.col="white",left.label.text.size=2,bottom.label="none")
 
-\f1\b \cf2 #ploting 
-\f0\b0 \cf0 \
- ggboxplot(hk_km_biomarker,x="Bacteria",y="Log10+1",add="jitter",color="Obesity",palette = "lancet")+labs(y=expression(Log[10]~"Relative abundance"),x=NULL)+stat_compare_means(aes(group = Obesity,label=..p.signif..),hide.ns = TRUE,label.y= 2,method = "wilcox.test",family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+ylim(-0.5,2.5)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 10,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+scale_x_discrete(limits=c("Candida_dubliniensis","Cryptococcus_neoformans","Lachancea_thermotolerans","Myceliophthora_thermophila","Parastagonospora_nodorum","Saccharomyces_paradoxus","Schizosaccharomyces_pombe"),breaks = c("Candida_dubliniensis","Cryptococcus_neoformans","Lachancea_thermotolerans","Myceliophthora_thermophila","Parastagonospora_nodorum","Saccharomyces_paradoxus","Schizosaccharomyces_pombe"),labels = c("Candida dubliniensis","Cryptococcus neoformans","Lachancea thermotolerans","Myceliophthora thermophila","Parastagonospora nodorum","Saccharomyces paradoxus","Schizosaccharomyces pombe"))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))\
-\
-\
-\pard\pardeftab720\partightenfactor0
 
-\f1\b \cf0 #the effect of medication and T2DM on gut mycobiome
-\f0\b0 \
- diversity2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/paper/medication/diversity2.csv",header=T)\
- ggboxplot(diversity2,x="sample",y="chao1",add="jitter",color="value",palette = "jama")+labs(y="Richness",x=NULL)+stat_compare_means(aes(group=value,label=..p.format..),label.y= 75,method = "t.test",family = "Arial",colour="black",face="bold",size=4)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 10,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))\
-\
- ggboxplot(diversity2,x="sample",y="shannon",add="jitter",color="value",palette = "jama")+labs(y="Diversity",x=NULL)+stat_compare_means(aes(group=value,label=..p.format..),label.y= 3.5,method = "t.test",family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 18,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))+ylim(0,4)\
-\
-\pard\pardeftab720\partightenfactor0
+#Heatmap
 
-\f1\b\fs56 \cf0 #The correlation between BMI and biomarker species
-\f0\b0\fs28 \
- library(Hmisc)\
- cc<-rcorr(as.matrix(BMI),type ="spearman")\
- flattenCorrMatrix <- function(cormat, pmat) \{\
-     ut <- upper.tri(cormat)\
-     data.frame(\
-         row = rownames(cormat)[row(cormat)[ut]],\
-         column = rownames(cormat)[col(cormat)[ut]],\
-         cor  =(cormat)[ut],\
-         p = pmat[ut]\
-     )\
- \}\
- bmi<-flattenCorrMatrix(cc$r, cc$P)\
- write.csv(bmi, file ="bmi_correlation.csv")\
-M<-as.matrix(bmi_correlation2$cor)\
- rownames(M) <- bmi_correlation2$column\
- colnames(M) <- c("BMI")\
- corrplot(M,method = "square",cl.lim = c(-0.3, 0.1))\
-\
+library(circlize)
+library(ComplexHeatmap)
 
-\f1\b\fs56 #Correlation between bacteriome and mycobiome (cor.test+corplot)
-\f0\b0\fs28 \
-\
-#Selecting the lines that values <0.01\
- myfun<-function(tao_hms_km_bacteria_species_norm)\{sum(tao_hms_km_bacteria_species_norm0.01)\}\
- apply(tao_hms_km_bacteria_species_norm,2,myfun)\
- apply(tao_hms_km_bacteria_species_norm,1,myfun)\
-tao_hms_km_bacteria_species_norm1<-tao_hms_km_bacteria_species_norm[as.logical(apply(tao_hms_km_bacteria_species_norm,1,myfun)),]\
- write.table(tao_hms_km_bacteria_species_norm1, file="correlation/tao_hms_km_bacteria_species_norm1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- tao_hms_km_bacteria_species1 <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_km_bacteria_species1.csv",row.names=1,header=T)\
-\
-#Selecting the OTU contained in 20% of the sample\
- nn<-96\
- mm<-0.2\
- mnn<-nn*mm\
- myfun<-function(tao_hms_km_bacteria_species1)\{sum(tao_hms_km_bacteria_species1!=0)\}\
-\
- tao_hms_km_bacteria_species2<-tao_hms_km_bacteria_species1[(apply(tao_hms_km_bacteria_species1,1,myfun)=mnn),]\
- write.table(tao_hms_km_bacteria_species2, file="correlation/tao_hms_km_bacteria_species2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\
-#cor.test\
- tao_hms_fungi_bacteria_correlation <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_fungi_bacteria_correlation.csv",row.names=1,header=T,sep=",")\
- tao_hms_bacteria.cor<-cor(tao_hms_fungi_bacteria_correlation[1:48,3:8],method = c("spearman"))\
- install.packages("Hmisc")\
- library("Hmisc")\
- install.packages("corrplot")\
-\pard\pardeftab720\partightenfactor0
+ myfun<-function(species_norm){sum(species_norm0.01)}
+ apply(hk_norm,2,myfun)
+ apply(hk_norm,1,myfun)
+ heatmap1<-species_norm[as.logical(apply(species_norm,1,myfun)),]
+ write.table(heatmap1, file="C:/users/dell/documents/r/hk/hk2/heatmap/heatmap1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-\f1\b\fs40 \cf0 \
-#After calculating mycobiome\uc0\u65292 microbiome\u30340 diversity, evenness and richness values\u65292 we assess the correlation and plot
-\f0\b0\fs28 \
- hk_lean_mycobiome_microbiome <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/microbiome_mycobiome/hk_lean/hk_lean_mycobiome_microbiome.csv",row.names=1,header=T)\
- hk_lean_mycobiome_microbiome_cor<-cor(hk_lean_mycobiome_microbiome[1:63,],method = c("spearman"))\
- library(corrplot)\
-#To calculate r and p value with package \'91rcorr\'92\
-\pard\pardeftab720\partightenfactor0
+ nn<-216(216 is the number of lines)
+ mm<-0.2（selecting the OTU present in 20% samples）
+ mnn<-nn*mm
+ myfun<-function(x){sum(x!=0)}
+ heatmap2<-km_genus_norm[(apply(genus_norm,1,myfun)=mnn),]
+ write.table(heatmap2, file="C:/users/dell/documents/r/km/km2/heatmap/heatmap2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-\fs32 \cf10 \cb8 library(Hmisc)
-\fs28 \cf0 \cb1 \
+mycol <- colorRamp2(c(-2, 0, 6), c("blue", "white", "red"))
+mycol <-  colorRamp2(c(-2, -1, 0, 2), c("blue", "cornflowerblue", "yellow", "gold"))
 
-\fs32 \cf10 \cb8  res1$r 
-\fs28 \cf0 \cb1 \
+#adding grouping ornament
+ ha<-HeatmapAnnotation(df=data.frame(Obesity_type=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity_type = c("Obese" = "#c53333", "Lean" = "#2d72bf"),Region=c("Hong Kong"="#d87e29","Kunming"="#ad3ab4")),annotation_legend_param = list(title_gp = gpar(fontsize = 10), labels_gp = gpar(fontsize = 10),fontface = "bold"))
 
-\fs32 \cf10 \cb8  res1$P
-\fs28 \cf0 \cb1 \
-\
-- res1<-rcorr(as.matrix(hk_lean_mycobiome_microbiome))\
- # flattenCorrMatrix\
- # ++++++++++++++++++++++++++++\
- # cormat : matrix of the correlation coefficients\
- # pmat : matrix of the correlation p-values\
- flattenCorrMatrix <- function(cormat, pmat) \{\
-     ut <- upper.tri(cormat)\
-     data.frame(\
-         row = rownames(cormat)[row(cormat)[ut]],\
-         column = rownames(cormat)[col(cormat)[ut]],\
-         cor  =(cormat)[ut],\
-         p = pmat[ut]\
-     )\
- \}\
- z1<-flattenCorrMatrix(res1$r, res1$P)\
- write.csv(z1, file = "correlation/microbiome_mycobiome/hk_lean/hk_lean_fb_correlation.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
-\pard\pardeftab720\partightenfactor0
-\cf2 #ploting \cf0 \
- corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 45,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9,title="hk_lean",mar=c(0,0,3,0),tl.pos="ld")\
-corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",p.mat=res1$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9)\
-\
-kunming_obese_correlation<-corrplot(tao_hms_bacteria.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,tl.offset = 1.5,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title=\'93Obese",mar=c(0,0,5,0))\
-kunming_lean_correlation<-corrplot(tao_hms_bacteria_lean.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title=title,mar=c(0,0,5,0),tl.pos="ld")\
-\pard\pardeftab720\qj\partightenfactor0
+ ha<-HeatmapAnnotation(df=data.frame(Obesity_type=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity_type = c("Obese" = "#c53333", "Lean" = "#2d72bf"),Region=c("Hong Kong"="#FF7F00","Kunming"="#ad3ab4")),annotation_legend_param = list(title_gp = gpar(fontsize = 10), labels_gp = gpar(fontsize = 10),fontface = "bold"))
+tao_hms_heatmap_plot<-Heatmap(matrix,name="Color key",col=mycol, cluster_columns = FALSE, cluster_rows = FALSE,top_annotation=ha, heatmap_legend_param = list(direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_column_dend =T,show_row_names = TRUE,row_dend_side="left",row_names_gp=gpar(fontsize=7,fontface="italic",fontface="bold"))
+draw(tao_hms_heatmap_plot, heatmap_legend_side = "bottom", annotation_legend_side = "right") 
+ 
 
-\f1\b\fs36 \cf5 #Export picture
-\f0\b0\fs28 \cf0 \
-\pard\pardeftab720\partightenfactor0
-\cf0 install.packages("Cairo","https://www.rdocumentation.org/packages/Cairo/versions/1.5-10/topics/Cairo")\
-library("Cairo")\
-Cairo.capabilities()\
- tao_hms_bacteria_obese.cor<-cor(tao_hms_fungi_bacteria_correlation[1:48,3:8],method = c("spearman"))\
- res1<-cor.mtest(tao_hms_fungi_bacteria_correlation[1:48,3:8],conf.level=0.95)\
- Cairo(file="kunming_Obese_correlation.png",type="png",width=480,height=480,bg="white")\
- corrplot(tao_hms_bacteria_obese.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,tl.offset = 1.5,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title="Obese",mar=c(0,0,5,0))\
- dev.off()\
-\
-tao_hms_bacteria_lean.cor<-cor(tao_hms_fungi_bacteria_correlation[49:96,3:8],method = c("spearman"))\
- res2<-cor.mtest(tao_hms_fungi_bacteria_correlation[49:96,3:8],conf.level=0.95)\
- Cairo(file="kunming_lean_correlation.png",type="png",width=480,height=480,bg="white")\
- corrplot(tao_hms_bacteria_lean.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,tl.offset = 1.5,diag=F,p.mat=res2$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title="Lean",mar=c(0,0,5,0))\
- dev.off()\
-\
-\pard\pardeftab720\partightenfactor0
+#Comparison
+ heatmap3 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/heatmap/heatmap3.csv",header=T)
+ha<-HeatmapAnnotation(df=data.frame(Obesity_type=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity_type = c("Obese" = "#c53333", "Lean" = "#2d72bf"),Region=c("Hong Kong"="#d87e29","Kunming"="#ad3ab4")),annotation_legend_param = list(title_gp = gpar(fontsize = 10), labels_gp = gpar(fontsize = 10),fontface = "bold"))
+ matrix<-data.matrix(km_hk_heatmap2[,2:218])
+ Heatmap(matrix,name="Color key",col=mycol, cluster_columns = FALSE, cluster_rows = FALSE,top_annotation=ha, heatmap_legend_param = list(direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_column_dend =T,show_row_names = TRUE,row_dend_side="left",row_names_gp=gpar(fontsize=7,fontface="italic",fontface="bold"))
+ km_hk_heatmap_plot<-Heatmap(matrix,name="Color key",col=mycol, cluster_columns = FALSE, cluster_rows = FALSE,top_annotation=ha, heatmap_legend_param = list(direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_column_dend =T,show_row_names = TRUE,row_dend_side="left",row_names_gp=gpar(fontsize=7,fontface="italic",fontface="bold"))
+ draw(km_hk_heatmap_plot, heatmap_legend_side = "bottom", annotation_legend_side = "right") 
+mycol <- colorRamp2(c(0, 0.5, 5), c("#377EB8","white","#E41A1C"))
+heatmap5 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/heatmap/heatmap5.csv",row.names=1,header=T)
+ matrix<-data.matrix(km_hk_heatmap5[,1:217])
+ library("RColorBrewer")
+ library("circlize")
+ library(ComplexHeatmap)
+ mycol <-  colorRamp2(c(1,2,3,4,5),brewer.pal(5, "RdYlBu")[2:6])
+ split = data.frame(c(rep("HK",118),rep("KM",99)))`
+ ha<-HeatmapAnnotation(df=data.frame(Obesity=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity = c("Obese" = "#FF4500", "Lean" = "#3B4992FF"),Region=c("Hong Kong"="#FFBECD","Kunming"="#91D1C2B2")),annotation_legend_param = list(title_gp = gpar(fontsize = 14,fontface="bold"), labels_gp = gpar(fontsize = 12),width = unit(4, "cm")))
 
-\f1\b\fs56 \cf0 #hk_obese
-\f0\b0\fs28 \
- hk_obese_microbiome_mycobiome <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/microbiome_mycobiome/hk_obese/hk_obese_microbiome_mycobiome.csv",row.names=1,header=T)\
- hk_obese_microbiome_mybiome_cor<-cor(hk_obese_microbiome_mycobiome[1:55,],method = c("spearman"))\
-\pard\pardeftab720\partightenfactor0
+ km_hk_heatmap_plot<-Heatmap(matrix,name="Color key",col=mycol,column_split = split, column_title=NULL,cluster_columns = FALSE, column_gap = unit(3, "mm"),cluster_rows = T,row_dend_side="left",clustering_distance_columns = "pearson",top_annotation=ha,heatmap_legend_param = list(title="",direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_row_names = TRUE,row_names_gp=gpar(fontsize=8,fontface="italic",fontface="bold"))
 
-\fs32 \cf10 \cb8  library(Hmisc)
-\fs28 \cf0 \cb1 \
- res2<-rcorr(as.matrix(hk_obese_microbiome_mybiome_cor))\
+ draw(km_hk_heatmap_plot, heatmap_legend_side = "bottom", annotation_legend_side = "right") 
 
-\fs32 \cf10 \cb8  res2$r 
-\fs28 \cf0 \cb1 \
+#Lefse
+ setwd("D:/phd/fungi analysis/HMS/hui's results/results/Lefse")
+ hk_km_biomarker <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker.csv")
+ View(hk_km_biomarker)
+ hk_km_biomarker <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker.csv",header=T)
+ library("reshape2")
+ hk_km_biomarker_melt <- melt(hk_km_biomarker, id.vars=c("id","Region","Obesity"), measure.vars=grep("s_", names(hk_km_biomarker), val=T),variable.name="species",value.name="value")
+ write.table(hk_km_biomarker_melt,file="D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker_melt.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+#ploting 
+ ggboxplot(hk_km_biomarker,x="Bacteria",y="Log10+1",add="jitter",color="Obesity",palette = "lancet")+labs(y=expression(Log[10]~"Relative abundance"),x=NULL)+stat_compare_means(aes(group = Obesity,label=..p.signif..),hide.ns = TRUE,label.y= 2,method = "wilcox.test",family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+ylim(-0.5,2.5)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 10,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+scale_x_discrete(limits=c("Candida_dubliniensis","Cryptococcus_neoformans","Lachancea_thermotolerans","Myceliophthora_thermophila","Parastagonospora_nodorum","Saccharomyces_paradoxus","Schizosaccharomyces_pombe"),breaks = c("Candida_dubliniensis","Cryptococcus_neoformans","Lachancea_thermotolerans","Myceliophthora_thermophila","Parastagonospora_nodorum","Saccharomyces_paradoxus","Schizosaccharomyces_pombe"),labels = c("Candida dubliniensis","Cryptococcus neoformans","Lachancea thermotolerans","Myceliophthora thermophila","Parastagonospora nodorum","Saccharomyces paradoxus","Schizosaccharomyces pombe"))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))
 
-\fs32 \cf10 \cb8  res2$P
-\fs28 \cf0 \cb1 \
-  z2<-flattenCorrMatrix(res2$r, res2$P)\
- write.csv(z1, file = "correlation/microbiome_mycobiome/hk_lean/hk_lean_fb_correlation.csv")\
-#ploting\
- corrplot(hk_obese_microbiome_mybiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 45,diag=F,p.mat=res2$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9,title="hk_obese",mar=c(0,0,3,0),tl.pos="ld")\
-\
-#hk_lean\
- corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 30,diag=F,p.mat=res1$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 1,title="(C) hk_lean",mar=c(0,0,1,0),tl.pos="ld")\
-\
-#km_lean\
- corrplot(km_lean_microbiome_mybiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 30,diag=F,p.mat=res1$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 1,title="(A) km_lean",mar=c(0,0,1,0),tl.pos="ld",cl.pos = "n")\
-\
-\
-\pard\pardeftab720\partightenfactor0
 
-\f1\b\fs56 \cf0 #Intra-kingdom
-\f0\b0\fs28 \
-\
- zh_km_HMS_species_abundance_all_final <- read.csv("D:/phd/fungi analysis/HMS/hui's results/yunnan/zh_km_HMS_species_abundance_all_final.txt",sep="\\t")\
- zh_km_HMS_phylum<-zh_km_HMS_species_abundance_all_final[,c(2,8:106)]\
- library("plyr")\
- zh_km_HMS_phylum2<-ddply(zh_km_HMS_phylum,"phylum",numcolwise(sum))\
-\
-\pard\pardeftab720\partightenfactor0
+#the effect of medication and T2DM on gut mycobiome
+ diversity2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/paper/medication/diversity2.csv",header=T)
+ ggboxplot(diversity2,x="sample",y="chao1",add="jitter",color="value",palette = "jama")+labs(y="Richness",x=NULL)+stat_compare_means(aes(group=value,label=..p.format..),label.y= 75,method = "t.test",family = "Arial",colour="black",face="bold",size=4)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 10,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))
 
-\f3\i\b \cf11 \cb12 # Filter out OTUs that have less than 2 reads on average
-\f0\i0\b0 \cf0 \cb1 \
-\pard\pardeftab720\partightenfactor0
+ ggboxplot(diversity2,x="sample",y="shannon",add="jitter",color="value",palette = "jama")+labs(y="Diversity",x=NULL)+stat_compare_means(aes(group=value,label=..p.format..),label.y= 3.5,method = "t.test",family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 18,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))+ylim(0,4)
 
-\f1\b \cf0 zh_km_HMS_species_norm_obese <- read.csv("D:/phd/fungi analysis/HMS/hui's results/yunnan/correlation/zh_km_HMS_species_norm_obese.csv",header=TRUE,row.names=1)
-\f4 \cf9 \cb12 \
-\pard\pardeftab720\partightenfactor0
+#The correlation between BMI and biomarker species
+ library(Hmisc)
+ cc<-rcorr(as.matrix(BMI),type ="spearman")
+ flattenCorrMatrix <- function(cormat, pmat) {
+     ut <- upper.tri(cormat)
+     data.frame(
+         row = rownames(cormat)[row(cormat)[ut]],
+         column = rownames(cormat)[col(cormat)[ut]],
+         cor  =(cormat)[ut],
+         p = pmat[ut]
+     )
+ }
+ bmi<-flattenCorrMatrix(cc$r, cc$P)
+ write.csv(bmi, file ="bmi_correlation.csv")
+M<-as.matrix(bmi_correlation2$cor)
+ rownames(M) <- bmi_correlation2$column
+ colnames(M) <- c("BMI")
+ corrplot(M,method = "square",cl.lim = c(-0.3, 0.1))
 
-\f3\i \cf11 # Subset to case NPS
-\f4\i0 \cf9 \
-case.NPS <-\cf13  \cf9 full.table[, \cf14 which\cf9 (\cf14 grepl\cf9 (\cf13 "S1"\cf9 , \cf14 names\cf9 (full.table)))]\
-case.NPS <-\cf13  \cf9 case.NPS[\cf15 -\cf14 which\cf9 (\cf14 rowMeans\cf9 (case.NPS) \cf15 <\cf13  \cf16 2\cf9 ),]\
-\pard\pardeftab720\partightenfactor0
+#Correlation between bacteriome and mycobiome (cor.test+corplot)
 
-\f1 \cf0 \cb1 write.table (zh_km_HMS_species_norm_lean2, file="hui's results/yunnan/correlation/zh_km_HMS_species_norm_lean2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
-\f0\b0 \
-\
-\pard\pardeftab720\partightenfactor0
+#Selecting the lines that values <0.01
+ myfun<-function(tao_hms_km_bacteria_species_norm){sum(tao_hms_km_bacteria_species_norm0.01)}
+ apply(tao_hms_km_bacteria_species_norm,2,myfun)
+ apply(tao_hms_km_bacteria_species_norm,1,myfun)
+tao_hms_km_bacteria_species_norm1<-tao_hms_km_bacteria_species_norm[as.logical(apply(tao_hms_km_bacteria_species_norm,1,myfun)),]
+ write.table(tao_hms_km_bacteria_species_norm1, file="correlation/tao_hms_km_bacteria_species_norm1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ tao_hms_km_bacteria_species1 <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_km_bacteria_species1.csv",row.names=1,header=T)
 
-\f1\b\fs72 \cf0 # SparCC\
-\pard\pardeftab720\partightenfactor0
+#Selecting the OTU contained in 20% of the sample
+ nn<-96
+ mm<-0.2
+ mnn<-nn*mm
+ myfun<-function(tao_hms_km_bacteria_species1){sum(tao_hms_km_bacteria_species1!=0)}
 
-\f0\b0\fs28 \cf0 \
- python SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/zh_km_HMS_species_norm_lean3.txt -c zh_km_HMS_lean_sparcc.txt -v zh_km_HMS_lean_cov_sparcc.txt \
- python MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/zh_km_HMS_species_norm_lean3.txt -p simulated_zh_km_HMS_lean/ -t permuted_#\
-  mkdir boot_zh_km_HMS_lean_corr\
- mkdir boot_zh_km_HMS_lean_cov\
- for i in `seq 0 99`; do python SparCC.py simulated_zh_km_HMS_lean/permuted_$i -c boot_zh_km_HMS_lean_corr/simulated_sparcc_$i.txt -v boot_zh_km_HMS_lean_cov/simulated_sparcc_$i.txt  zh_km_HMS_lean_boot_sparcc.log\
-; done\
- mkdir zh_km_HMS_lean_pvals\
- python PseudoPvals.py zh_km_HMS_lean_sparcc.txt boot_zh_km_HMS_lean_corr/simulated_sparcc_#.txt 100 -o zh_km_HMS_lean_pvals/one_sided.txt -t one_sided\
-\
-# editing in R\
- controls.corr <- as.matrix(read.table("data/controls_sparcc.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- hk_HMS_lean_sparcc <- as.matrix(read.table("tao's results/correlation/hk_HMS_lean/hk_HMS_lean_sparcc.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- hk_HMS_lean_one_sided <- as.matrix(read.table("tao's results/correlation/hk_HMS_lean/one_sided.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- zh_km_HMS_lean.1<-list(zh_km_HMS_lean_sparcc,zh_km_HMS_lean_one_sided)\
- corrplot(zh_km_HMS_lean.1[[1]],type="lower",order="FPC",p.mat=zh_km_HMS_lean.1[[2]],sig.level=0.05,insig="blank",tl.pos="n",diag=F,cl.pos="r")\
-\
- zh_km_HMS_lean_sparcc <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/yunnan/correlation/zh_km_HMS_lean/zh_km_HMS_lean_sparcc.txt",header = T, row.names = 1, sep = "\\t"))\
- hk_HMS_lean.all<-hk_HMS_lean_sparcc\
- hk_HMS_lean.all[lower.tri(hk_HMS_lean.all,diag=TRUE)]<-NA\
- hk_HMS_lean.all <- as.data.frame(as.table(hk_HMS_lean.all))\
- hk_HMS_lean.all <- na.omit(hk_HMS_lean.all)\
- names(hk_HMS_lean.all) <- c("Var1", "Var2", "Correlation")\
- write.table(hk_HMS_lean.all, file="tao's results/correlation/hk_HMS_lean/hk_HMS_lean_all.txt", sep = "\\t", row.names = F)\
- zh_km_HMS_lean_p <- zh_km_HMS_lean_one_sided \
- zh_km_HMS_lean_p[lower.tri(zh_km_HMS_lean_p, diag = TRUE)] <- NA\
- zh_km_HMS_lean_p <- as.data.frame(as.table(zh_km_HMS_lean_p))\
- zh_km_HMS_lean_p  <- na.omit(zh_km_HMS_lean_p)\
- names(zh_km_HMS_lean_p) <- c("Var1", "Var2", "p")\
- zh_km_HMS_lean.out <- merge(zh_km_HMS_lean, zh_km_HMS_lean_p)\
- zh_km_HMS_lean.out <- zh_km_HMS_lean.out[order(-abs(zh_km_HMS_lean.out$Correlation)),]\
- write.table(zh_km_HMS_obese.out, file="hui's results/yunnan/correlation/zh_km_HMS_lean/zh_km_HMS_lean_correlation.txt", sep = "\\t", row.names = F)\
-\
-\pard\pardeftab720\partightenfactor0
+ tao_hms_km_bacteria_species2<-tao_hms_km_bacteria_species1[(apply(tao_hms_km_bacteria_species1,1,myfun)=mnn),]
+ write.table(tao_hms_km_bacteria_species2, file="correlation/tao_hms_km_bacteria_species2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-\f1\b\fs48 \cf0 # hk_lean
-\f0\b0\fs28 \
- hk_lean_fungi_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_lean/hk_lean_fungi_norm.csv",header=T,row.names=1)\
- hk_lean_fungi_norm2<-hk_lean_fungi_norm[2:59,]\
- hk_lean_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_lean/hk_lean_fungi_norm2.csv",row.names=1,header=T)\
- hk_lean_fungi_norm4<-hk_lean_fungi_norm2[-which(rowMeans(hk_lean_fungi_norm2) < 2),]\
- write.table(hk_lean_fungi_norm4, file="correlation/hk_lean/hk_lean_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py hk_lean_fungi_norm_lessthan2.txt -c hk_lean_fungi_norm_sparcc.txt -v hk_lean_fungi_cov_sparcc.txt \
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py hk_lean_fungi_norm_lessthan2.txt -p simulated_hk_lean_fungi/ -t permuted_#\
- mkdir boot_hk_lean_fungi_norm_corr\
- mkdir boot_hk_lean_fungi_norm_cov\
- for i in `seq 0 99` \
- do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_lean_fungi/permuted_$i -c boot_hk_lean_fungi_norm_corr/simulated_sparcc_$i.txt -v boot_hk_lean_fungi_norm_cov/simulated_sparcc_$i.txt  hk_lean_fungi_norm_boot_sparcc.log\
- done\
- mkdir hk_lean_fungi_norm_pvals\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_lean_fungi_norm_sparcc.txt boot_hk_lean_fungi_norm_corr/simulated_sparcc_#.txt 100 -o hk_lean_fungi_norm_pvals/one_sided.txt -t one_sided\
-\
-# editing in r\
- hk_lean_fungi_norm_sparcc <-as.matrix(read.table("correlation/hk_lean/hk_lean_fungi_norm_sparcc.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- hk_lean_one_sided <- as.matrix(read.table("correlation/hk_lean/hk_lean_one_sided.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- hk_lean_fungi_merge<-list(hk_lean_fungi_norm_sparcc,hk_lean_one_sided)\
-corrplot(hk_lean_fungi_merge[[1]],type="lower",order="AOE",p.mat=hk_lean_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="hk_lean",cl.pos = "b")\
-\
-hk_lean_fungi_co<-hk_lean_fungi_norm_sparcc\
- hk_lean_fungi_co[lower.tri(hk_lean_fungi_co,diag=TRUE)]<-NA\
- hk_lean_fungi_co <- as.data.frame(as.table(hk_lean_fungi_co))\
- hk_lean_fungi_co <- na.omit(hk_lean_fungi_co)\
- names(hk_lean_fungi_co) <- c("Var1", "Var2", "Correlation")\
- write.table(hk_lean_fungi_co, file="correlation/hk_lean/hk_lean_fungi_co.txt", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- write.table(hk_lean_fungi_co, file="correlation/hk_lean/hk_lean_fungi_co.txt", sep = "\\t",dec=".",row.names = F)\
-\
- hk_lean_fungi_p <- hk_lean_one_sided\
- hk_lean_fungi_p[lower.tri(hk_lean_fungi_p, diag = TRUE)] <- NA\
- hk_lean_fungi_p <- as.data.frame(as.table(hk_lean_fungi_p))\
- hk_lean_fungi_p2  <- na.omit(hk_lean_fungi_p)\
- names(hk_lean_fungi_p2) <- c("Var1", "Var2", "p")\
- hk_lean_fungi.out <- merge(hk_lean_fungi_co, hk_lean_fungi_p2)\
- hk_lean_fungi.out <- hk_lean_fungi.out[order(-abs(hk_lean_fungi.out$Correlation)),]\
- write.table(hk_lean_fungi.out, file="correlation/hk_lean/hk_lean_fungi_correlation.txt", sep = "\\t",dec=".",row.names = F)\
-\
+#cor.test
+ tao_hms_fungi_bacteria_correlation <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_fungi_bacteria_correlation.csv",row.names=1,header=T,sep=",")
+ tao_hms_bacteria.cor<-cor(tao_hms_fungi_bacteria_correlation[1:48,3:8],method = c("spearman"))
+ install.packages("Hmisc")
+ library("Hmisc")
+ install.packages("corrplot")
 
-\f1\b\fs48 #hk_obese
-\f0\b0\fs28 \
- hk_obese_fungi_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_obese/hk_obese_fungi_norm.csv",row.names=1,header=T)\
- hk_obese_fungi_norm2<-hk_obese_fungi_norm[2:59,]\
- hk_obese_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_obese/hk_obese_fungi_norm2.csv",row.names=1,header=T)\
- hk_obese_fungi_norm4<-hk_obese_fungi_norm2[-which(rowMeans(hk_obese_fungi_norm2) < 2),]\
- write.table(hk_obese_fungi_norm4, file="correlation/hk_obese/hk_obese_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py hk_obese_fungi_norm_lessthan2.txt -c hk_obese_fungi_sparcc.txt -v hk_obese_fungi_cov_sparcc.txt \
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py hk_obese_fungi_norm_lessthan2.txt -p simulated_hk_obese_fungi/ -t permuted_#\
- mkdir boot_hk_obese_fungi_norm_corr\
- mkdir boot_hk_obese_fungi_norm_cov\
- for i in `seq 0 99` \
- do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_obese_fungi/permuted_$i -c boot_hk_obese_fungi_norm_corr/simulated_sparcc_$i.txt -v boot_hk_obese_fungi_norm_cov/simulated_sparcc_$i.txt  hk_obese_fungi_norm_boot_sparcc.log\
- done\
- mkdir hk_obese_fungi_pvals\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_obese_fungi_sparcc.txt boot_hk_obese_fungi_norm_corr/simulated_sparcc_#.txt 100 -o hk_obese_fungi_pvals/one_sided.txt -t one_sided\
-\
-\pard\pardeftab720\partightenfactor0
+#After calculating mycobiome，microbiome的diversity, evenness and richness values，we assess the correlation and plot
+ hk_lean_mycobiome_microbiome <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/microbiome_mycobiome/hk_lean/hk_lean_mycobiome_microbiome.csv",row.names=1,header=T)
+ hk_lean_mycobiome_microbiome_cor<-cor(hk_lean_mycobiome_microbiome[1:63,],method = c("spearman"))
+ library(corrplot)
+#To calculate r and p value with package ‘rcorr’
+library(Hmisc)
+ res1$r 
+ res1$P
 
-\f1\b \cf0 #editing in r
-\f0\b0 \
- hk_obese_fungi_sparcc <-as.matrix(read.table("correlation/hk_obese/hk_obese_fungi_sparcc.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- hk_obese_one_sided <- as.matrix(read.table("correlation/hk_obese/hk_obese_one_sided.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- hk_obese_fungi_merge<-list(hk_obese_fungi_sparcc,hk_obese_one_sided)\
-corrplot(hk_obese_fungi_merge[[1]],type="lower",order="AOE",p.mat=hk_obese_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="hk_lean",cl.pos = "b")\
-\
-hk_obese_fungi_co<-hk_obese_fungi_sparcc\
- hk_obese_fungi_co[lower.tri(hk_obese_fungi_co,diag=TRUE)]<-NA\
- hk_obese_fungi_co <- as.data.frame(as.table(hk_obese_fungi_co))\
- hk_obese_fungi_co <- na.omit(hk_obese_fungi_co)\
- names(hk_obese_fungi_co) <- c("Var1", "Var2", "Correlation")\
- write.table(hk_obese_fungi_co, file="correlation/hk_obese/hk_obese_fungi_co.txt", sep = "\\t",dec=".",row.names = F)\
-\
- hk_obese_fungi_p <- hk_obese_one_sided\
- hk_obese_fungi_p[lower.tri(hk_obese_fungi_p, diag = TRUE)] <- NA\
- hk_obese_fungi_p <- as.data.frame(as.table(hk_obese_fungi_p))\
- hk_obese_fungi_p2  <- na.omit(hk_obese_fungi_p)\
- names(hk_obese_fungi_p2) <- c("Var1", "Var2", "p")\
- hk_obese_fungi.out <- merge(hk_obese_fungi_co, hk_obese_fungi_p2)\
- hk_obese_fungi.out <- hk_obese_fungi.out[order(-abs(hk_obese_fungi.out$Correlation)),]\
- write.table(hk_obese_fungi.out, file="correlation/hk_obese/hk_obese_fungi_correlation.txt", sep = "\\t",dec=".",row.names = F)\
-\
-\pard\pardeftab720\partightenfactor0
+- res1<-rcorr(as.matrix(hk_lean_mycobiome_microbiome))
+ # flattenCorrMatrix
+ # ++++++++++++++++++++++++++++
+ # cormat : matrix of the correlation coefficients
+ # pmat : matrix of the correlation p-values
+ flattenCorrMatrix <- function(cormat, pmat) {
+     ut <- upper.tri(cormat)
+     data.frame(
+         row = rownames(cormat)[row(cormat)[ut]],
+         column = rownames(cormat)[col(cormat)[ut]],
+         cor  =(cormat)[ut],
+         p = pmat[ut]
+     )
+ }
+ z1<-flattenCorrMatrix(res1$r, res1$P)
+ write.csv(z1, file = "correlation/microbiome_mycobiome/hk_lean/hk_lean_fb_correlation.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+#ploting 
+ corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 45,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9,title="hk_lean",mar=c(0,0,3,0),tl.pos="ld")
+corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",p.mat=res1$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9)
 
-\f1\b\fs48 \cf0 #km_lean
-\f0\b0\fs28 \
- km_lean_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/km_lean/km_lean_fungi_norm2.csv",row.names=1,header=T)\
- km_lean_fungi_norm4<-km_lean_fungi_norm2[-which(rowMeans(km_lean_fungi_norm2) < 2),]\
- write.table(km_lean_fungi_norm4, file="correlation/km_lean/km_lean_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py km_lean_fungi_norm_lessthan2.txt -c km_lean_fungi_sparcc.txt -v km_lean_fungi_cov_sparcc.txt \
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py km_lean_fungi_norm_lessthan2.txt -p simulated_km_lean_fungi/ -t permuted_#\
- mkdir boot_km_lean_fungi_corr\
- mkdir boot_km_lean_fungi_cov\
- for i in `seq 0 99` \
- do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_lean_fungi/permuted_$i -c boot_km_lean_fungi_corr/simulated_sparcc_$i.txt -v boot_km_lean_fungi_cov/simulated_sparcc_$i.txt  km_lean_fungi_boot_sparcc.log\
- done\
- mkdir km_lean_fungi_pvals\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_lean_fungi_sparcc.txt boot_km_lean_fungi_corr/simulated_sparcc_#.txt 100 -o km_lean_fungi_pvals/one_sided.txt -t one_sided\
-\
-\pard\pardeftab720\partightenfactor0
+kunming_obese_correlation<-corrplot(tao_hms_bacteria.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,tl.offset = 1.5,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title=“Obese",mar=c(0,0,5,0))
+kunming_lean_correlation<-corrplot(tao_hms_bacteria_lean.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title=title,mar=c(0,0,5,0),tl.pos="ld")
+#Export picture
+install.packages("Cairo","https://www.rdocumentation.org/packages/Cairo/versions/1.5-10/topics/Cairo")
+library("Cairo")
+Cairo.capabilities()
+ tao_hms_bacteria_obese.cor<-cor(tao_hms_fungi_bacteria_correlation[1:48,3:8],method = c("spearman"))
+ res1<-cor.mtest(tao_hms_fungi_bacteria_correlation[1:48,3:8],conf.level=0.95)
+ Cairo(file="kunming_Obese_correlation.png",type="png",width=480,height=480,bg="white")
+ corrplot(tao_hms_bacteria_obese.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,tl.offset = 1.5,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title="Obese",mar=c(0,0,5,0))
+ dev.off()
 
-\f1\b \cf0 #editing in r
-\f0\b0 \
- km_lean_fungi_sparcc <-as.matrix(read.table("correlation/km_lean/km_lean_fungi_sparcc.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- km_lean_one_sided <- as.matrix(read.table("correlation/km_lean/km_lean_one_sided.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- km_lean_fungi_merge<-list(km_lean_fungi_sparcc,km_lean_one_sided)\
-corrplot(km_lean_fungi_merge[[1]],type="lower",order="AOE",p.mat=km_lean_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="hk_lean",cl.pos = "b")\
-\
- km_lean_fungi_co<-km_lean_fungi_sparcc\
- km_lean_fungi_co[lower.tri(km_lean_fungi_co,diag=TRUE)]<-NA\
- km_lean_fungi_co <- as.data.frame(as.table(km_lean_fungi_co))\
- km_lean_fungi_co <- na.omit(km_lean_fungi_co)\
- names(km_lean_fungi_co) <- c("Var1", "Var2", "Correlation")\
- write.table(km_lean_fungi_co, file="correlation/km_lean/km_lean_fungi_co.txt", sep = "\\t",dec=".",row.names = F)\
-\
- km_lean_fungi_p <- km_lean_one_sided\
- km_lean_fungi_p[lower.tri(km_lean_fungi_p, diag = TRUE)] <- NA\
- km_lean_fungi_p <- as.data.frame(as.table(km_lean_fungi_p))\
- km_lean_fungi_p2  <- na.omit(km_lean_fungi_p)\
- names(km_lean_fungi_p2) <- c("Var1", "Var2", "p")\
- km_lean_fungi.out <- merge(km_lean_fungi_co, km_lean_fungi_p2)\
- km_lean_fungi.out <- km_lean_fungi.out[order(-abs(km_lean_fungi.out$Correlation)),]\
- write.table(km_lean_fungi.out, file="correlation/km_lean/km_lean_fungi_correlation.txt", sep = "\\t",dec=".",row.names = F)\
-\
-\pard\pardeftab720\partightenfactor0
+tao_hms_bacteria_lean.cor<-cor(tao_hms_fungi_bacteria_correlation[49:96,3:8],method = c("spearman"))
+ res2<-cor.mtest(tao_hms_fungi_bacteria_correlation[49:96,3:8],conf.level=0.95)
+ Cairo(file="kunming_lean_correlation.png",type="png",width=480,height=480,bg="white")
+ corrplot(tao_hms_bacteria_lean.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,tl.offset = 1.5,diag=F,p.mat=res2$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title="Lean",mar=c(0,0,5,0))
+ dev.off()
 
-\f1\b\fs48 \cf0 #km_obese
-\f0\b0\fs28 \
- km_obese_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/km_obese/km_obese_fungi_norm2.csv",row.names=1,header=T)\
- km_obese_fungi_norm4<-km_obese_fungi_norm2[-which(rowMeans(km_obese_fungi_norm2) < 2),]\
- write.table(km_obese_fungi_norm4, file="correlation/km_obese/km_obese_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py km_obese_fungi_norm_lessthan2.txt -c km_obese_fungi_sparcc.txt -v km_obese_fungi_cov_sparcc.txt \
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py km_obese_fungi_norm_lessthan2.txt -p simulated_km_obese_fungi/ -t permuted_#\
- mkdir boot_km_obese_fungi_corr\
- mkdir boot_km_obese_fungi_cov\
- for i in `seq 0 99` \
- do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_obese_fungi/permuted_$i -c boot_km_obese_fungi_corr/simulated_sparcc_$i.txt -v boot_km_obese_fungi_cov/simulated_sparcc_$i.txt  km_obese_fungi_boot_sparcc.log\
- done\
- mkdir km_obese_fungi_pvals\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_obese_fungi_sparcc.txt boot_km_obese_fungi_corr/simulated_sparcc_#.txt 100 -o km_obese_fungi_pvals/one_sided.txt -t one_sided\
-\
-\pard\pardeftab720\partightenfactor0
+#hk_obese
+ hk_obese_microbiome_mycobiome <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/microbiome_mycobiome/hk_obese/hk_obese_microbiome_mycobiome.csv",row.names=1,header=T)
+ hk_obese_microbiome_mybiome_cor<-cor(hk_obese_microbiome_mycobiome[1:55,],method = c("spearman"))
+ library(Hmisc)
+ res2<-rcorr(as.matrix(hk_obese_microbiome_mybiome_cor))
+ res2$r 
+ res2$P
+  z2<-flattenCorrMatrix(res2$r, res2$P)
+ write.csv(z1, file = "correlation/microbiome_mycobiome/hk_lean/hk_lean_fb_correlation.csv")
+#ploting
+ corrplot(hk_obese_microbiome_mybiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 45,diag=F,p.mat=res2$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9,title="hk_obese",mar=c(0,0,3,0),tl.pos="ld")
 
-\f1\b \cf0 #editing in r
-\f0\b0 \
- km_obese_fungi_sparcc <-as.matrix(read.table("correlation/km_obese/km_obese_fungi_sparcc.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- km_obese_one_sided <- as.matrix(read.table("correlation/km_obese/km_obese_one_sided.txt", header = T, row.names = 1, sep = "\\t", check.names = F))\
- km_obese_fungi_merge<-list(km_obese_fungi_sparcc,km_obese_one_sided)\
-corrplot(km_lean_fungi_merge[[1]],type="lower",order="AOE",p.mat=km_lean_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="km_obese",cl.pos = "b")\
-\
- km_obese_fungi_co<-km_obese_fungi_sparcc\
- km_obese_fungi_co[lower.tri(km_obese_fungi_co,diag=TRUE)]<-NA\
- km_obese_fungi_co <- as.data.frame(as.table(km_obese_fungi_co))\
- km_obese_fungi_co <- na.omit(km_obese_fungi_co)\
- names(km_obese_fungi_co) <- c("Var1", "Var2", "Correlation")\
- write.table(km_obese_fungi_co, file="correlation/km_obese/km_obese_fungi_co.txt", sep = "\\t",dec=".",row.names = F)\
-\
- km_obese_fungi_p <- km_obese_one_sided\
- km_obese_fungi_p[lower.tri(km_obese_fungi_p, diag = TRUE)] <- NA\
- km_obese_fungi_p <- as.data.frame(as.table(km_obese_fungi_p))\
- km_obese_fungi_p2  <- na.omit(km_obese_fungi_p)\
- names(km_obese_fungi_p2) <- c("Var1", "Var2", "p")\
- km_obese_fungi.out <- merge(km_obese_fungi_co, km_lean_fungi_p2)\
- km_obese_fungi.out <- km_obese_fungi.out[order(-abs(km_obese_fungi.out$Correlation)),]\
- write.table(km_obese_fungi.out, file="correlation/km_obese/km_obese_fungi_correlation.txt", sep = "\\t",dec=".",row.names = F)\
-\
-\pard\pardeftab720\partightenfactor0
+#hk_lean
+ corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 30,diag=F,p.mat=res1$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 1,title="(C) hk_lean",mar=c(0,0,1,0),tl.pos="ld")
 
-\f1\b\fs56 \cf0 Inter-kingdom correlation
-\f0\b0\fs28 \
-\
- hk_lean_bacteria_genus_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_bacteria_genus_norm.csv",row.names=1,header=T)\
- hk_lean_bacteria_genus_norm_less2 <- hk_lean_bacteria_genus_norm[-which(rowMeans(hk_lean_bacteria_genus_norm) < 2),]\
- write.table(hk_lean_bacteria_genus_norm_less2, file="genus/hk_lean/data/hk_lean_bacteria_genus_norm_less2.csv", sep = ",",dec=".",col.names = TRUE,row.names = TRUE)\
-\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_lean/hk_lean_fungi_bacteria_genus_norm.txt -c hk_lean_fungi_bacteria_genus_sparcc.txt -v hk_lean_fungi_bacteria_genus_cov_sparcc.txt \
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_lean/hk_lean_fungi_bacteria_genus_norm.txt -p simulated_hk_lean_fungi_bacteria_genus/ -t permuted_#\
-  mkdir boot_hk_lean_fungi_bacteria_genus_corr\
- mkdir boot_hk_lean_fungi_bacteria_genus_cov\
- for i in `seq 0 99`; \
-do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_lean_fungi_bacteria_genus/permuted_$i -c boot_hk_lean_fungi_bacteria_genus_corr/simulated_sparcc_$i.txt -v boot_hk_lean_fungi_bacteria_genus_cov/simulated_sparcc_$i.txt  hk_lean_fungi_bacteria_genus_boot_sparcc.log\
-; done\
- mkdir hk_lean_fungi_bacteria_genus_pvals\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_lean_fungi_bacteria_genus_sparcc.txt boot_hk_lean_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o hk_lean_fungi_bacteria_genus_pvals/hk_lean_fungi_bacteria_genus_one_sided.txt -t one_sided\
+#km_lean
+ corrplot(km_lean_microbiome_mybiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 30,diag=F,p.mat=res1$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 1,title="(A) km_lean",mar=c(0,0,1,0),tl.pos="ld",cl.pos = "n")
 
-\f1\b\fs56 in r
-\f0\b0\fs28 \
- hk_lean_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\\t",check.names=F))\
- hk_lean_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\\t",check.names=F))\
- hk_lean_fungi_bacteria_genus_merge<-\
-list(hk_lean_fungi_bacteria_genus_sparcc1,hk_lean_fungi_bacteria_genus_one_sided1)\
-corrplot(hk_lean_fungi_bacteria_genus_merge[[1]],is.corr=FALSE,mar=c(6,0,0,4),cl.lim = c(-1, 1),p.mat=hk_lean_fungi_bacteria_genus_merge[[2]],insig="blank",tl.cex=0.8,tl.col="black",tl.offset=0.5,cl.pos = "r",cl.offset=0.1,cl.cex=0.8,sig.level = 0.05)\
-#calculating r and p value\
- hk_lean_fungi_bacteria_genus_co<-hk_lean_fungi_bacteria_genus_sparcc1\
- hk_lean_fungi_bacteria_genus_co[lower.tri(hk_lean_fungi_bacteria_genus_co,diag=TRUE)]<-NA\
- hk_lean_fungi_bacteria_genus_co <- as.data.frame(as.table(hk_lean_fungi_bacteria_genus_co))\
- hk_lean_fungi_bacteria_genus_co <- na.omit(hk_lean_fungi_bacteria_genus_co)\
- names(hk_lean_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")\
- write.table(hk_lean_fungi_bacteria_genus_co, file="genus/hk_lean/data/hk_lean_fungi_bacteria_genus_co.txt", sep = "\\t",dec=".",row.names = F)\
-\
- hk_lean_fungi_bacteria_genus_p <- hk_lean_fungi_bacteria_genus_one_sided1\
- hk_lean_fungi_bacteria_genus_p[lower.tri(hk_lean_fungi_bacteria_genus_p, diag = TRUE)] <- NA\
-hk_lean_fungi_bacteria_genus_p <- as.data.frame(as.table(hk_lean_fungi_bacteria_genus_p))\
- hk_lean_fungi_bacteria_genus_p2  <- na.omit(hk_lean_fungi_bacteria_genus_p)\
- names(hk_lean_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")\
- hk_lean_fungi_bacteria_genus.out <- merge(hk_lean_fungi_bacteria_genus_co,hk_lean_fungi_bacteria_genus_p2)\
- hk_lean_fungi_bacteria_genus.out <- hk_lean_fungi_bacteria_genus.out[order(-abs(hk_lean_fungi_bacteria_genus.out$Correlation)),]\
- write.table(hk_lean_fungi_bacteria_genus.out, file="genus/hk_lean/data/hk_lean_fungi_bacteria_genus_correlation.txt", sep = "\\t",dec=".",row.names = F)\
-\pard\pardeftab720\partightenfactor0
 
-\f5 \cf17 \
-\pard\pardeftab720\partightenfactor0
+#Intra-kingdom
 
-\f0 \cf0 #hk_obese\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_obese/hk_obese_fungi_bacteria_genus_norm.txt -c hk_obese_fungi_bacteria_genus_sparcc.txt -v hk_obese_fungi_bacteria_genus_cov_sparcc.txt \
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_obese/hk_obese_fungi_bacteria_genus_norm.txt -p simulated_hk_obese_fungi_bacteria_genus/ -t permuted_#\
-  mkdir boot_hk_obese_fungi_bacteria_genus_corr\
- mkdir boot_hk_obese_fungi_bacteria_genus_cov\
- for i in `seq 0 99`; \
-do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_obese_fungi_bacteria_genus/permuted_$i -c boot_hk_obese_fungi_bacteria_genus_corr/simulated_sparcc_$i.txt -v boot_hk_obese_fungi_bacteria_genus_cov/simulated_sparcc_$i.txt  hk_obese_fungi_bacteria_genus_boot_sparcc.log\
-; done\
- mkdir hk_obese_fungi_bacteria_genus_pvals\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_obese_fungi_bacteria_genus_sparcc.txt boot_hk_obese_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o hk_obese_fungi_bacteria_genus_pvals/hk_obese_fungi_bacteria_genus_one_sided.txt -t one_sided\
-\pard\pardeftab720\partightenfactor0
+ zh_km_HMS_species_abundance_all_final <- read.csv("D:/phd/fungi analysis/HMS/hui's results/yunnan/zh_km_HMS_species_abundance_all_final.txt",sep="\t")
+ zh_km_HMS_phylum<-zh_km_HMS_species_abundance_all_final[,c(2,8:106)]
+ library("plyr")
+ zh_km_HMS_phylum2<-ddply(zh_km_HMS_phylum,"phylum",numcolwise(sum))
 
-\f1\b\fs56 \cf0 in r
-\f0\b0\fs28 \
- hk_obese_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_obese/data/hk_obese_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\\t",check.names=F))\
- hk_obese_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_obese/data/hk_obese_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\\t",check.names=F))\
- hk_obese_fungi_bacteria_genus_merge<-\
-list(hk_obese_fungi_bacteria_genus_sparcc1,hk_obese_fungi_bacteria_genus_one_sided1)\
-corrplot(hk_obese_fungi_bacteria_genus_merge[[1]],is.corr=FALSE,mar=c(6,0,0,4),cl.lim = c(-1, 1),p.mat=hk_obese_fungi_bacteria_genus_merge[[2]],insig="blank",tl.cex=0.8,tl.col="black",tl.offset=0.5,cl.pos = "r",cl.offset=0.1,cl.cex=0.8,sig.level = 0.05)\
-#calculating r and p value\
- hk_obese_fungi_bacteria_genus_co<-hk_obese_fungi_bacteria_genus_sparcc1\
- hk_obese_fungi_bacteria_genus_co[lower.tri(hk_obese_fungi_bacteria_genus_co,diag=TRUE)]<-NA\
- hk_obese_fungi_bacteria_genus_co <- as.data.frame(as.table(hk_obese_fungi_bacteria_genus_co))\
- hk_obese_fungi_bacteria_genus_co <- na.omit(hk_obese_fungi_bacteria_genus_co)\
- names(hk_obese_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")\
- write.table(hk_obese_fungi_bacteria_genus_co, file="genus/hk_obese/data/hk_obese_fungi_bacteria_genus_co.txt", sep = "\\t",dec=".",row.names = F)\
-\
- hk_obese_fungi_bacteria_genus_p <- hk_obese_fungi_bacteria_genus_one_sided1\
- hk_obese_fungi_bacteria_genus_p[lower.tri(hk_obese_fungi_bacteria_genus_p, diag = TRUE)] <- NA\
-hk_obese_fungi_bacteria_genus_p <- as.data.frame(as.table(hk_obese_fungi_bacteria_genus_p))\
- hk_obese_fungi_bacteria_genus_p2  <- na.omit(hk_obese_fungi_bacteria_genus_p)\
- names(hk_obese_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")\
- hk_obese_fungi_bacteria_genus.out <- merge(hk_obese_fungi_bacteria_genus_co,hk_obese_fungi_bacteria_genus_p2)\
- hk_obese_fungi_bacteria_genus.out <- hk_obese_fungi_bacteria_genus.out[order(-abs(hk_obese_fungi_bacteria_genus.out$Correlation)),]\
- write.table(hk_obese_fungi_bacteria_genus.out, file="genus/hk_obese/data/hk_obese_fungi_bacteria_genus_correlation.txt", sep = "\\t",dec=".",row.names = F)\
-\
-#km_lean\
-\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/km_lean/km_lean_fungi_bacteria_genus_norm.txt -c km_lean_fungi_bacteria_genus_sparcc.txt -v km_lean_fungi_bacteria_genus_cov_sparcc.txt \
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/km_lean/km_lean_fungi_bacteria_genus_norm.txt -p simulated_km_lean_fungi_bacteria_genus/ -t permuted_#\
-  mkdir boot_km_lean_fungi_bacteria_genus_corr\
- mkdir boot_km_lean_fungi_bacteria_genus_cov\
- for i in `seq 0 99`; \
-do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_lean_fungi_bacteria_genus/permuted_$i -c boot_km_lean_fungi_bacteria_genus_corr/simulated_sparcc_$i.txt -v boot_km_lean_fungi_bacteria_genus_cov/simulated_sparcc_$i.txt  km_lean_fungi_bacteria_genus_boot_sparcc.log\
-; done\
- mkdir km_lean_fungi_bacteria_genus_pvals\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_lean_fungi_bacteria_genus_sparcc.txt boot_km_lean_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o km_lean_fungi_bacteria_genus_pvals/km_lean_fungi_bacteria_genus_one_sided.txt -t one_sided\
+# Filter out OTUs that have less than 2 reads on average
+zh_km_HMS_species_norm_obese <- read.csv("D:/phd/fungi analysis/HMS/hui's results/yunnan/correlation/zh_km_HMS_species_norm_obese.csv",header=TRUE,row.names=1)
+# Subset to case NPS
+case.NPS <- full.table[, which(grepl("S1", names(full.table)))]
+case.NPS <- case.NPS[-which(rowMeans(case.NPS) < 2),]
+write.table (zh_km_HMS_species_norm_lean2, file="hui's results/yunnan/correlation/zh_km_HMS_species_norm_lean2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-\f1\b\fs56 in r
-\f0\b0\fs28 \
- km_lean_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/km_lean/data/km_lean_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\\t",check.names=F))\
- km_lean_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/km_lean/data/km_lean_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\\t",check.names=F))\
- km_lean_fungi_bacteria_genus_merge<-\
-list(km_lean_fungi_bacteria_genus_sparcc1,km_lean_fungi_bacteria_genus_one_sided1)\
-corrplot(km_lean_fungi_bacteria_genus_merge[[1]],is.corr=FALSE,mar=c(6,0,0,4),cl.lim = c(-1, 1),p.mat=km_lean_fungi_bacteria_genus_merge[[2]],insig="blank",tl.cex=0.8,tl.col="black",tl.offset=0.5,cl.pos = "r",cl.offset=0.1,cl.cex=0.8,sig.level = 0.05)\
-#calculating r and p value\
- km_lean_fungi_bacteria_genus_co<-km_lean_fungi_bacteria_genus_sparcc1\
- km_lean_fungi_bacteria_genus_co[lower.tri(km_lean_fungi_bacteria_genus_co,diag=TRUE)]<-NA\
- km_lean_fungi_bacteria_genus_co <- as.data.frame(as.table(km_lean_fungi_bacteria_genus_co))\
- km_lean_fungi_bacteria_genus_co <- na.omit(km_lean_fungi_bacteria_genus_co)\
- names(km_lean_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")\
- write.table(km_lean_fungi_bacteria_genus_co, file="genus/km_lean/data/km_lean_fungi_bacteria_genus_co.txt", sep = "\\t",dec=".",row.names = F)\
-\
-km_lean_fungi_bacteria_genus_p <- km_lean_fungi_bacteria_genus_one_sided1 \
- km_lean_fungi_bacteria_genus_p[lower.tri(km_lean_fungi_bacteria_genus_p, diag = TRUE)] <- NA\
-km_lean_fungi_bacteria_genus_p <- as.data.frame(as.table(km_lean_fungi_bacteria_genus_p))\
- km_lean_fungi_bacteria_genus_p2  <- na.omit(km_lean_fungi_bacteria_genus_p)\
- names(km_lean_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")\
- km_lean_fungi_bacteria_genus.out <- merge(km_lean_fungi_bacteria_genus_co,km_lean_fungi_bacteria_genus_p2)\
- km_lean_fungi_bacteria_genus.out <- km_lean_fungi_bacteria_genus.out[order(-abs(km_lean_fungi_bacteria_genus.out$Correlation)),]\
- write.table(km_lean_fungi_bacteria_genus.out, file="genus/km_lean/data/km_lean_fungi_bacteria_genus_correlation.txt", sep = "\\t",dec=".",row.names = F)\
-\
-\
-#km_obese\
-\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/km_obese/km_obese_fungi_bacteria_genus_norm.txt -c km_obese_fungi_bacteria_genus_sparcc.txt -v km_obese_fungi_bacteria_genus_cov_sparcc.txt \
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/km_obese/km_obese_fungi_bacteria_genus_norm.txt -p simulated_km_obese_fungi_bacteria_genus/ -t permuted_#\
-  mkdir boot_km_obese_fungi_bacteria_genus_corr\
- mkdir boot_km_obese_fungi_bacteria_genus_cov\
- for i in `seq 0 99`; \
-do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_obese_fungi_bacteria_genus/permuted_$i -c boot_km_obese_fungi_bacteria_genus_corr/simulated_sparcc_$i.txt -v boot_km_obese_fungi_bacteria_genus_cov/simulated_sparcc_$i.txt  km_obese_fungi_bacteria_genus_boot_sparcc.log\
-; done\
- mkdir km_obese_fungi_bacteria_genus_pvals\
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_obese_fungi_bacteria_genus_sparcc.txt boot_km_obese_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o km_obese_fungi_bacteria_genus_pvals/km_obese_fungi_bacteria_genus_one_sided.txt -t one_sided\
+# SparCC
 
-\f1\b\fs56 in r
-\f0\b0\fs28 \
- km_obese_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/km_obese/data/km_obese_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\\t",check.names=F))\
- km_obese_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/km_obese/data/km_obese_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\\t",check.names=F))\
- km_obese_fungi_bacteria_genus_merge<-\
-list(km_obese_fungi_bacteria_genus_sparcc1,km_obese_fungi_bacteria_genus_one_sided1)\
-corrplot(km_obese_fungi_bacteria_genus_merge[[1]],is.corr=FALSE,mar=c(6,0,0,4),cl.lim = c(-1, 1),p.mat=km_obese_fungi_bacteria_genus_merge[[2]],insig="blank",tl.cex=0.8,tl.col="black",tl.offset=0.5,cl.pos = "r",cl.offset=0.1,cl.cex=0.8,sig.level = 0.05)\
-#caculating r and p value\
- km_obese_fungi_bacteria_genus_co<-km_obese_fungi_bacteria_genus_sparcc1\
- km_obese_fungi_bacteria_genus_co[lower.tri(km_obese_fungi_bacteria_genus_co,diag=TRUE)]<-NA\
- km_obese_fungi_bacteria_genus_co <- as.data.frame(as.table(km_obese_fungi_bacteria_genus_co))\
- km_obese_fungi_bacteria_genus_co <- na.omit(km_obese_fungi_bacteria_genus_co)\
- names(km_obese_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")\
- write.table(km_obese_fungi_bacteria_genus_co, file="genus/km_obese/data/km_obese_fungi_bacteria_genus_co.txt", sep = "\\t",dec=".",row.names = F)\
-\
- km_obese_fungi_bacteria_genus_p <- km_obese_fungi_bacteria_genus_one_sided1\
- km_obese_fungi_bacteria_genus_p[lower.tri(km_obese_fungi_bacteria_genus_p, diag = TRUE)] <- NA\
-km_obese_fungi_bacteria_genus_p <- as.data.frame(as.table(km_obese_fungi_bacteria_genus_p))\
- km_obese_fungi_bacteria_genus_p2  <- na.omit(km_obese_fungi_bacteria_genus_p)\
- names(km_obese_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")\
- km_obese_fungi_bacteria_genus.out <- merge(km_obese_fungi_bacteria_genus_co,km_obese_fungi_bacteria_genus_p2)\
- km_obese_fungi_bacteria_genus.out <- km_obese_fungi_bacteria_genus.out[order(-abs(km_obese_fungi_bacteria_genus.out$Correlation)),]\
- write.table(km_obese_fungi_bacteria_genus.out, file="genus/km_obese/data/km_obese_fungi_bacteria_genus_correlation.txt", sep = "\\t",dec=".",row.names = F)\
-\
+ python SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/zh_km_HMS_species_norm_lean3.txt -c zh_km_HMS_lean_sparcc.txt -v zh_km_HMS_lean_cov_sparcc.txt 
+ python MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/zh_km_HMS_species_norm_lean3.txt -p simulated_zh_km_HMS_lean/ -t permuted_#
+  mkdir boot_zh_km_HMS_lean_corr
+ mkdir boot_zh_km_HMS_lean_cov
+ for i in `seq 0 99`; do python SparCC.py simulated_zh_km_HMS_lean/permuted_$i -c boot_zh_km_HMS_lean_corr/simulated_sparcc_$i.txt -v boot_zh_km_HMS_lean_cov/simulated_sparcc_$i.txt  zh_km_HMS_lean_boot_sparcc.log
+; done
+ mkdir zh_km_HMS_lean_pvals
+ python PseudoPvals.py zh_km_HMS_lean_sparcc.txt boot_zh_km_HMS_lean_corr/simulated_sparcc_#.txt 100 -o zh_km_HMS_lean_pvals/one_sided.txt -t one_sided
 
-\f1\b\fs56 #co-occurrence network
-\f0\b0\fs28 \
-\
-library("igraph")\
-library("psych")\
- tao_hms_km_species_norm <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/tao_hms_km_species_norm.csv",header=T,row.names=1)\
- otu<-t(tao_hms_km_fungi_bacteria_species_correlation)\
- write.table(otu, file="correlation/otu.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)\
- otu <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/otu.csv",row.names=1,header=T)\
- occor<-corr.test(otu,use="pairwise",method="spearman",adjust="fdr",alpha=0.5)\
-\
- occor.r=occor$r\
- occor.p=occor$p\
-\pard\pardeftab720\partightenfactor0
-\cf0 \cb6  occor.r[occor.p0.05|abs(occor.r)<0.1] = 0 \cb1 \
- igraph = graph_from_adjacency_matrix(occor.r,mode="undirected",weighted=TRUE,diag=FALSE)\
- igraph\
- occor.r[occor.r!=0] = 1\
- igraph = graph_from_adjacency_matrix(occor.r,mode="undirected",weighted=NULL,diag=FALSE)\
- bad.vs = V(igraph)[degree(igraph) == 0]\
- igraph = delete.vertices(igraph, bad.vs)\
- igraph\
- igraph.weight = E(igraph)$weight\
- E(igraph)$weight = NA\
- set.seed(123)\
- plot(igraph,main="Co-occurrence network",vertex.frame.color=NA,vetex.color="plum", vertex.label=NA,edge.width=1,vertex.size=5,edge.lty=1,edge.curved=TRUE,margin=c(0,0,0,0),
-\f6\fs26 layout\cf18 =\cf0 layout_in_circle
-\f0\fs28 )\
-\
- bad.vs = V(igraph)[degree(igraph) == 0]\
- igraph = delete.vertices(igraph, bad.vs)\
- igraph\
- igraph.weight = E(igraph)$weight\
- E(igraph)$weight = NA\
- sum(igraph.weight0)# number of postive correlation\
-[1] 142\
- sum(igraph.weight<0)# number of negative correlation\
-[1] 0\
- E.color = igraph.weight\
- E.color = ifelse(E.color0, "red",ifelse(E.color<0, "blue","grey"))\
- E(igraph)$color = as.character(E.color)\
-\
-library(qgraph)\
-library(vegan)\
-library(MCL)\
-library(SpiecEasi)\
-hk_lean_fungi_bacteria_phylum_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/phylum/hk_lean/data/hk_lean_fungi_bacteria_phylum_norm.csv",row.names=1,header=T)\
-\
-\pard\pardeftab720\partightenfactor0
+# editing in R
+ controls.corr <- as.matrix(read.table("data/controls_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ hk_HMS_lean_sparcc <- as.matrix(read.table("tao's results/correlation/hk_HMS_lean/hk_HMS_lean_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ hk_HMS_lean_one_sided <- as.matrix(read.table("tao's results/correlation/hk_HMS_lean/one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ zh_km_HMS_lean.1<-list(zh_km_HMS_lean_sparcc,zh_km_HMS_lean_one_sided)
+ corrplot(zh_km_HMS_lean.1[[1]],type="lower",order="FPC",p.mat=zh_km_HMS_lean.1[[2]],sig.level=0.05,insig="blank",tl.pos="n",diag=F,cl.pos="r")
 
-\f1\b\fs36 \cf0 # Get p-values
-\f0\b0\fs28 \
-pvals <- sapply(1:taxa,\
-function(i) sapply(1:taxa, function(j)\
-sum(MB.mat[i, j, 1]  MB.mat[i, j, 2:num_perms])))\
-pvals <- pvals / num_perms\
-# p-value correction\
-pvals_BH <- array(p.adjust(pvals, method = "BH"),\
-dim=c(nrow(pvals), ncol(pvals)))\
-# Build adjacency matrix\
-adj.mat <- ifelse(pvals_BH = (1 - sig_level), 1, 0)\
-# Add names to rows & cols\
-rownames(adj.mat) <- colnames(MB)\
-colnames(adj.mat) <- colnames(MB)\
-# Build and return the network\
-graph <- graph.adjacency(adj.mat, mode = "undirected", diag = FALSE)\
-\pard\pardeftab720\partightenfactor0
+ zh_km_HMS_lean_sparcc <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/yunnan/correlation/zh_km_HMS_lean/zh_km_HMS_lean_sparcc.txt",header = T, row.names = 1, sep = "\t"))
+ hk_HMS_lean.all<-hk_HMS_lean_sparcc
+ hk_HMS_lean.all[lower.tri(hk_HMS_lean.all,diag=TRUE)]<-NA
+ hk_HMS_lean.all <- as.data.frame(as.table(hk_HMS_lean.all))
+ hk_HMS_lean.all <- na.omit(hk_HMS_lean.all)
+ names(hk_HMS_lean.all) <- c("Var1", "Var2", "Correlation")
+ write.table(hk_HMS_lean.all, file="tao's results/correlation/hk_HMS_lean/hk_HMS_lean_all.txt", sep = "\t", row.names = F)
+ zh_km_HMS_lean_p <- zh_km_HMS_lean_one_sided 
+ zh_km_HMS_lean_p[lower.tri(zh_km_HMS_lean_p, diag = TRUE)] <- NA
+ zh_km_HMS_lean_p <- as.data.frame(as.table(zh_km_HMS_lean_p))
+ zh_km_HMS_lean_p  <- na.omit(zh_km_HMS_lean_p)
+ names(zh_km_HMS_lean_p) <- c("Var1", "Var2", "p")
+ zh_km_HMS_lean.out <- merge(zh_km_HMS_lean, zh_km_HMS_lean_p)
+ zh_km_HMS_lean.out <- zh_km_HMS_lean.out[order(-abs(zh_km_HMS_lean.out$Correlation)),]
+ write.table(zh_km_HMS_obese.out, file="hui's results/yunnan/correlation/zh_km_HMS_lean/zh_km_HMS_lean_correlation.txt", sep = "\t", row.names = F)
 
-\f7\fs34 \cf8 \cb9 \}
-\f0\fs28 \cf0 \cb1 \
-\
-\
-\pard\pardeftab720\partightenfactor0
+# hk_lean
+ hk_lean_fungi_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_lean/hk_lean_fungi_norm.csv",header=T,row.names=1)
+ hk_lean_fungi_norm2<-hk_lean_fungi_norm[2:59,]
+ hk_lean_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_lean/hk_lean_fungi_norm2.csv",row.names=1,header=T)
+ hk_lean_fungi_norm4<-hk_lean_fungi_norm2[-which(rowMeans(hk_lean_fungi_norm2) < 2),]
+ write.table(hk_lean_fungi_norm4, file="correlation/hk_lean/hk_lean_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py hk_lean_fungi_norm_lessthan2.txt -c hk_lean_fungi_norm_sparcc.txt -v hk_lean_fungi_cov_sparcc.txt 
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py hk_lean_fungi_norm_lessthan2.txt -p simulated_hk_lean_fungi/ -t permuted_#
+ mkdir boot_hk_lean_fungi_norm_corr
+ mkdir boot_hk_lean_fungi_norm_cov
+ for i in `seq 0 99` 
+ do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_lean_fungi/permuted_$i -c boot_hk_lean_fungi_norm_corr/simulated_sparcc_$i.txt -v boot_hk_lean_fungi_norm_cov/simulated_sparcc_$i.txt  hk_lean_fungi_norm_boot_sparcc.log
+ done
+ mkdir hk_lean_fungi_norm_pvals
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_lean_fungi_norm_sparcc.txt boot_hk_lean_fungi_norm_corr/simulated_sparcc_#.txt 100 -o hk_lean_fungi_norm_pvals/one_sided.txt -t one_sided
 
-\f1\b\fs56 \cf0 #FUNGuild
-\f0\b0\fs28 \
-\
-python Guilds_v1.1.py -otu /lustre/project/SCNg/zhanhui/FUNGuild/km_hk_species_norm_otu_table.txt -db fungi -m -u\
- ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="groups",y="Saprotroph",add="jitter",ylabs="Saprotroph",color="groups")+labs(y="Saprotroph",x=NULL)+scale_color_jco()+stat_compare_means(method="anova",label.y=210,size=3.5)+geom_signif(comparisons = my_comparison,step_increase=0.25,map_signif_level = F,
-\fs32 \cf7 \cb8 test = "wilcox.test"
-\fs28 \cf0 \cb1 )+border("black")+theme(axis.title.x = element_text(size = 16,face = "plain",color = "black"), axis.title.y = element_text(size = 16,face = "plain",color = "black"), axis.text = element_text(size = 16,face = "plain",color = "black"), legend.position = "none", legend.title = element_text(), legend.text = element_text(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size = 1.2),panel.background = element_blank())\
-\
-#ploting\
- hk_lean_species_norm_otu_table.guilds_plot <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/FUNGuild/pie/hk_lean_species_norm_otu_table.guilds_plot.csv",row.names=1,header=T)\
- library(gridExtra)\
- library(ggplot2)\
- library("RColorBrewer")\
- ggplot(data = km_obese_species_norm_otu_table.guilds_plot, mapping = aes(x = factor(groups), fill = factor(function))) + geom_bar(stat = 'Relative_abundance', position = 'fill')\
- colourCount = length(unique(km_obese_species_norm_otu_table.guilds_plot$func))\
- getPalette = colorRampPalette(brewer.pal(9, "Set1"))\
-\
- ggplot(data = km_lean_species_norm_otu_table.guilds_plot,mapping=aes(x=reorder(groups,Relative_abundance,decreasing = TRUE),y=Relative_abundance,fill=func))+geom_bar(stat= 'identity', position = 'fill',width = 1.6)+coord_polar(theta = 'x')+labs(x = '', y = '', title = '')+theme(legend.key.size = unit(0.5,"line"),axis.text = element_blank(),axis.title=element_blank(),axis.ticks = element_blank(),legend.title=element_blank(),legend.text = element_text(size = 8),panel.grid=element_blank(),panel.border=element_blank(),panel.background = element_blank())+scale_fill_manual(values = getPalette(colourCount))+scale_color_manual(values = getPalette(colourCount))+ theme(legend.position="bottom") +guides(fill=guide_legend(nrow=2))\
-\
-  ggplot(data = hk_lean_species_norm_otu_table.guilds_plot2,mapping=aes(x=reorder(groups,Relative_abundance),y=Relative_abundance,fill=func))+geom_bar(stat= 'identity', position = 'fill',width = 1.6)+coord_polar(theta = 'x')+guides(fill=FALSE)+theme(plot.title=element_text(family="Arial",colour="black",size=18,face="bold",hjust=0.5,vjust=-8),axis.text = element_blank(),axis.title=element_blank(),axis.ticks = element_blank(),panel.grid=element_blank(),panel.border=element_blank(),panel.background = element_blank())+scale_fill_manual(values = getPalette(colourCount))+scale_color_manual(values = getPalette(colourCount))+labs(title="Lean in HK")\
-\
- ggplot(data = hk_obese_species_norm_otu_table.guilds_plot,mapping=aes(x=reorder(groups,Relative_abundance,decreasing = TRUE),y=Relative_abundance,fill=func))+geom_bar(stat= 'identity', position = 'fill',width = 1.5)+coord_polar(theta = 'x')+labs(x = '', y = '', title = 'hk_obese')+theme(legend.position="bottom") +guides(fill=guide_legend(nrow=2))+theme(legend.key.size = unit(0.5,"line"),axis.text = element_blank(),axis.title=element_blank(),axis.ticks = element_blank(),legend.title=element_blank(),legend.text = element_text(size = 8),panel.grid=element_blank(),panel.border=element_blank(),panel.background = element_blank())+scale_fill_manual(values = getPalette(colourCount))+scale_color_manual(values = getPalette(colourCount))\
-\
- ggplot(data = km_obese_species_norm_otu_table.guilds_plot2,mapping=aes(x=reorder(groups,Relative_abundance),y=Relative_abundance,fill=func))+geom_bar(stat= 'identity', position = 'fill',width = 1.6)+coord_polar(theta = 'x')+theme(plot.title=element_text(family="Arial",colour="black",size=18,face="bold",hjust=0.5,vjust=-8),axis.text = element_blank(),axis.title=element_blank(),axis.ticks = element_blank(),panel.grid=element_blank(),panel.border=element_blank(),panel.background = element_blank(),legend.position = "right",legend.title = element_text(family="Arial",colour="black",size=16,face="bold"),legend.text =element_text(family="Arial",colour="black",size=14))+scale_fill_manual(values = getPalette(colourCount))+scale_color_manual(values = getPalette(colourCount))+labs(title="Obesity in KM")+guides(fill=guide_legend(title="Guilds",ncol =1))\
-\
-\pard\pardeftab720\qj\partightenfactor0
-\cf0 km_hk_species_norm_otu_table.guilds_plot <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/FUNGuild/km_hk_species_norm_otu_table.guilds_plot.csv",row.names=1,header=T)\
- library("ggplot2")\
- library("ggpubr")\
- library("ggsci")\
-labels <- c(Hongkong = "HK", Kunming = "KM")\
-\
-my_comparisons<-list(c("Lean","Obese"))\
-\
-\pard\pardeftab720\qj\partightenfactor0
+# editing in r
+ hk_lean_fungi_norm_sparcc <-as.matrix(read.table("correlation/hk_lean/hk_lean_fungi_norm_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ hk_lean_one_sided <- as.matrix(read.table("correlation/hk_lean/hk_lean_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ hk_lean_fungi_merge<-list(hk_lean_fungi_norm_sparcc,hk_lean_one_sided)
+corrplot(hk_lean_fungi_merge[[1]],type="lower",order="AOE",p.mat=hk_lean_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="hk_lean",cl.pos = "b")
 
-\f1\b\fs36 \cf0 #epiphyte
-\f0\b0\fs28 \
-\pard\pardeftab720\partightenfactor0
-\cf0 ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Epiphyte",add="jitter",palette ="lancet",color="obesity")+labs(y="Epiphyte",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=30,label.x=30,family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=5),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 10), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 10),axis.title.y = element_text(face = "bold", size = 10, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=50,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=15), strip.background = element_rect(colour="black",size=12,linetype="solid"))\
-\
-\pard\pardeftab720\partightenfactor0
+hk_lean_fungi_co<-hk_lean_fungi_norm_sparcc
+ hk_lean_fungi_co[lower.tri(hk_lean_fungi_co,diag=TRUE)]<-NA
+ hk_lean_fungi_co <- as.data.frame(as.table(hk_lean_fungi_co))
+ hk_lean_fungi_co <- na.omit(hk_lean_fungi_co)
+ names(hk_lean_fungi_co) <- c("Var1", "Var2", "Correlation")
+ write.table(hk_lean_fungi_co, file="correlation/hk_lean/hk_lean_fungi_co.txt", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ write.table(hk_lean_fungi_co, file="correlation/hk_lean/hk_lean_fungi_co.txt", sep = "\t",dec=".",row.names = F)
 
-\f1\b\fs36 \cf0 #plant pathogen
-\f0\b0\fs28 \
-ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Plant_pathogen",add="jitter",palette = "lancet",color="obesity")+labs(y="Plant pathogen",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=110,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+ylim(0,120)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))\
-\
+ hk_lean_fungi_p <- hk_lean_one_sided
+ hk_lean_fungi_p[lower.tri(hk_lean_fungi_p, diag = TRUE)] <- NA
+ hk_lean_fungi_p <- as.data.frame(as.table(hk_lean_fungi_p))
+ hk_lean_fungi_p2  <- na.omit(hk_lean_fungi_p)
+ names(hk_lean_fungi_p2) <- c("Var1", "Var2", "p")
+ hk_lean_fungi.out <- merge(hk_lean_fungi_co, hk_lean_fungi_p2)
+ hk_lean_fungi.out <- hk_lean_fungi.out[order(-abs(hk_lean_fungi.out$Correlation)),]
+ write.table(hk_lean_fungi.out, file="correlation/hk_lean/hk_lean_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
 
-\f1\b\fs36 #plant saprotroph
-\f0\b0\fs28 \
-ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Plant_saprotroph",add="jitter",palette = "lancet",color="obesity")+labs(y="Plant saprotroph",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=35,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+ylim(0,40)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))\
-\
+#hk_obese
+ hk_obese_fungi_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_obese/hk_obese_fungi_norm.csv",row.names=1,header=T)
+ hk_obese_fungi_norm2<-hk_obese_fungi_norm[2:59,]
+ hk_obese_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_obese/hk_obese_fungi_norm2.csv",row.names=1,header=T)
+ hk_obese_fungi_norm4<-hk_obese_fungi_norm2[-which(rowMeans(hk_obese_fungi_norm2) < 2),]
+ write.table(hk_obese_fungi_norm4, file="correlation/hk_obese/hk_obese_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py hk_obese_fungi_norm_lessthan2.txt -c hk_obese_fungi_sparcc.txt -v hk_obese_fungi_cov_sparcc.txt 
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py hk_obese_fungi_norm_lessthan2.txt -p simulated_hk_obese_fungi/ -t permuted_#
+ mkdir boot_hk_obese_fungi_norm_corr
+ mkdir boot_hk_obese_fungi_norm_cov
+ for i in `seq 0 99` 
+ do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_obese_fungi/permuted_$i -c boot_hk_obese_fungi_norm_corr/simulated_sparcc_$i.txt -v boot_hk_obese_fungi_norm_cov/simulated_sparcc_$i.txt  hk_obese_fungi_norm_boot_sparcc.log
+ done
+ mkdir hk_obese_fungi_pvals
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_obese_fungi_sparcc.txt boot_hk_obese_fungi_norm_corr/simulated_sparcc_#.txt 100 -o hk_obese_fungi_pvals/one_sided.txt -t one_sided
 
-\f1\b\fs36 #animal endosymbiont
-\f0\b0\fs28 \
- ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Animal_endosymbiont",add="jitter",palette = "lancet",color="obesity")+labs(y="Animal endosymbiont",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=50,label.x=1.4,family = "Arial",colour="black",face="bold",size=15)+ylim(0,60)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 35), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 35),axis.title.y = element_text(face = "bold", size = 40, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=35,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(face="bold",size=30), strip.background = element_rect(colour="black",size=2,linetype="solid"))\
-\
+#editing in r
+ hk_obese_fungi_sparcc <-as.matrix(read.table("correlation/hk_obese/hk_obese_fungi_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ hk_obese_one_sided <- as.matrix(read.table("correlation/hk_obese/hk_obese_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ hk_obese_fungi_merge<-list(hk_obese_fungi_sparcc,hk_obese_one_sided)
+corrplot(hk_obese_fungi_merge[[1]],type="lower",order="AOE",p.mat=hk_obese_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="hk_lean",cl.pos = "b")
 
-\f1\b\fs36 #soil saprotroph
-\f0\b0\fs28 \
- ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Soil_saprotroph",add="jitter",palette ="lancet",color="obesity")+labs(y="Soil saprotroph",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=17,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+ylim(0,18)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))\
-\
+hk_obese_fungi_co<-hk_obese_fungi_sparcc
+ hk_obese_fungi_co[lower.tri(hk_obese_fungi_co,diag=TRUE)]<-NA
+ hk_obese_fungi_co <- as.data.frame(as.table(hk_obese_fungi_co))
+ hk_obese_fungi_co <- na.omit(hk_obese_fungi_co)
+ names(hk_obese_fungi_co) <- c("Var1", "Var2", "Correlation")
+ write.table(hk_obese_fungi_co, file="correlation/hk_obese/hk_obese_fungi_co.txt", sep = "\t",dec=".",row.names = F)
 
-\f1\b\fs36 # wood saprotroph
-\f0\b0\fs28 \
- ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Wood_saprotroph",add="jitter",palette ="lancet",color="obesity")+labs(y="Wood saprotroph",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=17,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+ylim(0,18)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))\
-\
+ hk_obese_fungi_p <- hk_obese_one_sided
+ hk_obese_fungi_p[lower.tri(hk_obese_fungi_p, diag = TRUE)] <- NA
+ hk_obese_fungi_p <- as.data.frame(as.table(hk_obese_fungi_p))
+ hk_obese_fungi_p2  <- na.omit(hk_obese_fungi_p)
+ names(hk_obese_fungi_p2) <- c("Var1", "Var2", "p")
+ hk_obese_fungi.out <- merge(hk_obese_fungi_co, hk_obese_fungi_p2)
+ hk_obese_fungi.out <- hk_obese_fungi.out[order(-abs(hk_obese_fungi.out$Correlation)),]
+ write.table(hk_obese_fungi.out, file="correlation/hk_obese/hk_obese_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
 
-\f1\b\fs36 #dung_saprotroph
-\f0\b0\fs28 \
-ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Dung_saprotroph",add="jitter",palette ="lancet",color="obesity")+labs(y="Dung saprotroph",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=17,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+ylim(0,18)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))\
-\
+#km_lean
+ km_lean_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/km_lean/km_lean_fungi_norm2.csv",row.names=1,header=T)
+ km_lean_fungi_norm4<-km_lean_fungi_norm2[-which(rowMeans(km_lean_fungi_norm2) < 2),]
+ write.table(km_lean_fungi_norm4, file="correlation/km_lean/km_lean_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py km_lean_fungi_norm_lessthan2.txt -c km_lean_fungi_sparcc.txt -v km_lean_fungi_cov_sparcc.txt 
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py km_lean_fungi_norm_lessthan2.txt -p simulated_km_lean_fungi/ -t permuted_#
+ mkdir boot_km_lean_fungi_corr
+ mkdir boot_km_lean_fungi_cov
+ for i in `seq 0 99` 
+ do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_lean_fungi/permuted_$i -c boot_km_lean_fungi_corr/simulated_sparcc_$i.txt -v boot_km_lean_fungi_cov/simulated_sparcc_$i.txt  km_lean_fungi_boot_sparcc.log
+ done
+ mkdir km_lean_fungi_pvals
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_lean_fungi_sparcc.txt boot_km_lean_fungi_corr/simulated_sparcc_#.txt 100 -o km_lean_fungi_pvals/one_sided.txt -t one_sided
 
-\f1\b\fs36 #endophyte
-\f0\b0\fs28 \
- ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Endophyte",add="jitter",palette ="lancet",color="obesity")+labs(y="Endophyte",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=65,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))\
-\
+#editing in r
+ km_lean_fungi_sparcc <-as.matrix(read.table("correlation/km_lean/km_lean_fungi_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ km_lean_one_sided <- as.matrix(read.table("correlation/km_lean/km_lean_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ km_lean_fungi_merge<-list(km_lean_fungi_sparcc,km_lean_one_sided)
+corrplot(km_lean_fungi_merge[[1]],type="lower",order="AOE",p.mat=km_lean_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="hk_lean",cl.pos = "b")
 
-\f1\b\fs36 #animal pathogen
-\f0\b0\fs28 \
-ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Animal_pathogen",add="jitter",palette ="lancet",color="obesity")+labs(y="Animal pathogen",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=65,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))\
-\
+ km_lean_fungi_co<-km_lean_fungi_sparcc
+ km_lean_fungi_co[lower.tri(km_lean_fungi_co,diag=TRUE)]<-NA
+ km_lean_fungi_co <- as.data.frame(as.table(km_lean_fungi_co))
+ km_lean_fungi_co <- na.omit(km_lean_fungi_co)
+ names(km_lean_fungi_co) <- c("Var1", "Var2", "Correlation")
+ write.table(km_lean_fungi_co, file="correlation/km_lean/km_lean_fungi_co.txt", sep = "\t",dec=".",row.names = F)
 
-\f1\b\fs36 #ploting
-\f0\b0\fs28 \
-Cairo({\field{\*\fldinst{HYPERLINK "http://astrostatistics.psu.edu/su07/R/html/graphics/html/file.html"}}{\fldrslt \cf19 \ul \ulc19 file}}="Cairo_PNG_96_dpi.png", type="png\'94, {\field{\*\fldinst{HYPERLINK "http://astrostatistics.psu.edu/su07/R/html/graphics/html/units.html"}}{\fldrslt \cf19 \ul \ulc19 units}}="in", width=5, height=4, pointsize=12, dpi=96, my_sc_plot(data)\
-\pard\pardeftab720\partightenfactor0
-{\field{\*\fldinst{HYPERLINK "http://astrostatistics.psu.edu/su07/R/html/stats/html/summary.lm.html"}}{\fldrslt \cf19 \ul \ulc19 dev.off}}()\
-plot<-ggboxplot(km_hk_species_norm_otu_table.guilds_plot_region2,x="sample",y="value",color="Region",add="jitter",palette ="jco")+labs(y="Relative abundance",x=NULL)+stat_compare_means(aes(group=Region),label="p.signif",method="t.test",label.y=50,family = "Arial",colour="black",face="bold",size=12)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5),legend.text=element_text(size = 14, face = "bold",family="Arial",colour = "black"),legend.title=element_text(face = "bold", size = 16, family="Arial",colour = "black"))\
-ggsave("plot.pdf",device=cairo_pdf,width=400,height=210,units="mm")\
-\
+ km_lean_fungi_p <- km_lean_one_sided
+ km_lean_fungi_p[lower.tri(km_lean_fungi_p, diag = TRUE)] <- NA
+ km_lean_fungi_p <- as.data.frame(as.table(km_lean_fungi_p))
+ km_lean_fungi_p2  <- na.omit(km_lean_fungi_p)
+ names(km_lean_fungi_p2) <- c("Var1", "Var2", "p")
+ km_lean_fungi.out <- merge(km_lean_fungi_co, km_lean_fungi_p2)
+ km_lean_fungi.out <- km_lean_fungi.out[order(-abs(km_lean_fungi.out$Correlation)),]
+ write.table(km_lean_fungi.out, file="correlation/km_lean/km_lean_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
+
+#km_obese
+ km_obese_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/km_obese/km_obese_fungi_norm2.csv",row.names=1,header=T)
+ km_obese_fungi_norm4<-km_obese_fungi_norm2[-which(rowMeans(km_obese_fungi_norm2) < 2),]
+ write.table(km_obese_fungi_norm4, file="correlation/km_obese/km_obese_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py km_obese_fungi_norm_lessthan2.txt -c km_obese_fungi_sparcc.txt -v km_obese_fungi_cov_sparcc.txt 
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py km_obese_fungi_norm_lessthan2.txt -p simulated_km_obese_fungi/ -t permuted_#
+ mkdir boot_km_obese_fungi_corr
+ mkdir boot_km_obese_fungi_cov
+ for i in `seq 0 99` 
+ do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_obese_fungi/permuted_$i -c boot_km_obese_fungi_corr/simulated_sparcc_$i.txt -v boot_km_obese_fungi_cov/simulated_sparcc_$i.txt  km_obese_fungi_boot_sparcc.log
+ done
+ mkdir km_obese_fungi_pvals
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_obese_fungi_sparcc.txt boot_km_obese_fungi_corr/simulated_sparcc_#.txt 100 -o km_obese_fungi_pvals/one_sided.txt -t one_sided
+
+#editing in r
+ km_obese_fungi_sparcc <-as.matrix(read.table("correlation/km_obese/km_obese_fungi_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ km_obese_one_sided <- as.matrix(read.table("correlation/km_obese/km_obese_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+ km_obese_fungi_merge<-list(km_obese_fungi_sparcc,km_obese_one_sided)
+corrplot(km_lean_fungi_merge[[1]],type="lower",order="AOE",p.mat=km_lean_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="km_obese",cl.pos = "b")
+
+ km_obese_fungi_co<-km_obese_fungi_sparcc
+ km_obese_fungi_co[lower.tri(km_obese_fungi_co,diag=TRUE)]<-NA
+ km_obese_fungi_co <- as.data.frame(as.table(km_obese_fungi_co))
+ km_obese_fungi_co <- na.omit(km_obese_fungi_co)
+ names(km_obese_fungi_co) <- c("Var1", "Var2", "Correlation")
+ write.table(km_obese_fungi_co, file="correlation/km_obese/km_obese_fungi_co.txt", sep = "\t",dec=".",row.names = F)
+
+ km_obese_fungi_p <- km_obese_one_sided
+ km_obese_fungi_p[lower.tri(km_obese_fungi_p, diag = TRUE)] <- NA
+ km_obese_fungi_p <- as.data.frame(as.table(km_obese_fungi_p))
+ km_obese_fungi_p2  <- na.omit(km_obese_fungi_p)
+ names(km_obese_fungi_p2) <- c("Var1", "Var2", "p")
+ km_obese_fungi.out <- merge(km_obese_fungi_co, km_lean_fungi_p2)
+ km_obese_fungi.out <- km_obese_fungi.out[order(-abs(km_obese_fungi.out$Correlation)),]
+ write.table(km_obese_fungi.out, file="correlation/km_obese/km_obese_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
+
+Inter-kingdom correlation
+
+ hk_lean_bacteria_genus_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_bacteria_genus_norm.csv",row.names=1,header=T)
+ hk_lean_bacteria_genus_norm_less2 <- hk_lean_bacteria_genus_norm[-which(rowMeans(hk_lean_bacteria_genus_norm) < 2),]
+ write.table(hk_lean_bacteria_genus_norm_less2, file="genus/hk_lean/data/hk_lean_bacteria_genus_norm_less2.csv", sep = ",",dec=".",col.names = TRUE,row.names = TRUE)
+
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_lean/hk_lean_fungi_bacteria_genus_norm.txt -c hk_lean_fungi_bacteria_genus_sparcc.txt -v hk_lean_fungi_bacteria_genus_cov_sparcc.txt 
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_lean/hk_lean_fungi_bacteria_genus_norm.txt -p simulated_hk_lean_fungi_bacteria_genus/ -t permuted_#
+  mkdir boot_hk_lean_fungi_bacteria_genus_corr
+ mkdir boot_hk_lean_fungi_bacteria_genus_cov
+ for i in `seq 0 99`; 
+do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_lean_fungi_bacteria_genus/permuted_$i -c boot_hk_lean_fungi_bacteria_genus_corr/simulated_sparcc_$i.txt -v boot_hk_lean_fungi_bacteria_genus_cov/simulated_sparcc_$i.txt  hk_lean_fungi_bacteria_genus_boot_sparcc.log
+; done
+ mkdir hk_lean_fungi_bacteria_genus_pvals
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_lean_fungi_bacteria_genus_sparcc.txt boot_hk_lean_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o hk_lean_fungi_bacteria_genus_pvals/hk_lean_fungi_bacteria_genus_one_sided.txt -t one_sided
+in r
+ hk_lean_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\t",check.names=F))
+ hk_lean_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\t",check.names=F))
+ hk_lean_fungi_bacteria_genus_merge<-
+list(hk_lean_fungi_bacteria_genus_sparcc1,hk_lean_fungi_bacteria_genus_one_sided1)
+corrplot(hk_lean_fungi_bacteria_genus_merge[[1]],is.corr=FALSE,mar=c(6,0,0,4),cl.lim = c(-1, 1),p.mat=hk_lean_fungi_bacteria_genus_merge[[2]],insig="blank",tl.cex=0.8,tl.col="black",tl.offset=0.5,cl.pos = "r",cl.offset=0.1,cl.cex=0.8,sig.level = 0.05)
+#calculating r and p value
+ hk_lean_fungi_bacteria_genus_co<-hk_lean_fungi_bacteria_genus_sparcc1
+ hk_lean_fungi_bacteria_genus_co[lower.tri(hk_lean_fungi_bacteria_genus_co,diag=TRUE)]<-NA
+ hk_lean_fungi_bacteria_genus_co <- as.data.frame(as.table(hk_lean_fungi_bacteria_genus_co))
+ hk_lean_fungi_bacteria_genus_co <- na.omit(hk_lean_fungi_bacteria_genus_co)
+ names(hk_lean_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")
+ write.table(hk_lean_fungi_bacteria_genus_co, file="genus/hk_lean/data/hk_lean_fungi_bacteria_genus_co.txt", sep = "\t",dec=".",row.names = F)
+
+ hk_lean_fungi_bacteria_genus_p <- hk_lean_fungi_bacteria_genus_one_sided1
+ hk_lean_fungi_bacteria_genus_p[lower.tri(hk_lean_fungi_bacteria_genus_p, diag = TRUE)] <- NA
+hk_lean_fungi_bacteria_genus_p <- as.data.frame(as.table(hk_lean_fungi_bacteria_genus_p))
+ hk_lean_fungi_bacteria_genus_p2  <- na.omit(hk_lean_fungi_bacteria_genus_p)
+ names(hk_lean_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")
+ hk_lean_fungi_bacteria_genus.out <- merge(hk_lean_fungi_bacteria_genus_co,hk_lean_fungi_bacteria_genus_p2)
+ hk_lean_fungi_bacteria_genus.out <- hk_lean_fungi_bacteria_genus.out[order(-abs(hk_lean_fungi_bacteria_genus.out$Correlation)),]
+ write.table(hk_lean_fungi_bacteria_genus.out, file="genus/hk_lean/data/hk_lean_fungi_bacteria_genus_correlation.txt", sep = "\t",dec=".",row.names = F)
+
+#hk_obese
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_obese/hk_obese_fungi_bacteria_genus_norm.txt -c hk_obese_fungi_bacteria_genus_sparcc.txt -v hk_obese_fungi_bacteria_genus_cov_sparcc.txt 
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_obese/hk_obese_fungi_bacteria_genus_norm.txt -p simulated_hk_obese_fungi_bacteria_genus/ -t permuted_#
+  mkdir boot_hk_obese_fungi_bacteria_genus_corr
+ mkdir boot_hk_obese_fungi_bacteria_genus_cov
+ for i in `seq 0 99`; 
+do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_obese_fungi_bacteria_genus/permuted_$i -c boot_hk_obese_fungi_bacteria_genus_corr/simulated_sparcc_$i.txt -v boot_hk_obese_fungi_bacteria_genus_cov/simulated_sparcc_$i.txt  hk_obese_fungi_bacteria_genus_boot_sparcc.log
+; done
+ mkdir hk_obese_fungi_bacteria_genus_pvals
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_obese_fungi_bacteria_genus_sparcc.txt boot_hk_obese_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o hk_obese_fungi_bacteria_genus_pvals/hk_obese_fungi_bacteria_genus_one_sided.txt -t one_sided
+in r
+ hk_obese_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_obese/data/hk_obese_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\t",check.names=F))
+ hk_obese_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_obese/data/hk_obese_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\t",check.names=F))
+ hk_obese_fungi_bacteria_genus_merge<-
+list(hk_obese_fungi_bacteria_genus_sparcc1,hk_obese_fungi_bacteria_genus_one_sided1)
+corrplot(hk_obese_fungi_bacteria_genus_merge[[1]],is.corr=FALSE,mar=c(6,0,0,4),cl.lim = c(-1, 1),p.mat=hk_obese_fungi_bacteria_genus_merge[[2]],insig="blank",tl.cex=0.8,tl.col="black",tl.offset=0.5,cl.pos = "r",cl.offset=0.1,cl.cex=0.8,sig.level = 0.05)
+#calculating r and p value
+ hk_obese_fungi_bacteria_genus_co<-hk_obese_fungi_bacteria_genus_sparcc1
+ hk_obese_fungi_bacteria_genus_co[lower.tri(hk_obese_fungi_bacteria_genus_co,diag=TRUE)]<-NA
+ hk_obese_fungi_bacteria_genus_co <- as.data.frame(as.table(hk_obese_fungi_bacteria_genus_co))
+ hk_obese_fungi_bacteria_genus_co <- na.omit(hk_obese_fungi_bacteria_genus_co)
+ names(hk_obese_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")
+ write.table(hk_obese_fungi_bacteria_genus_co, file="genus/hk_obese/data/hk_obese_fungi_bacteria_genus_co.txt", sep = "\t",dec=".",row.names = F)
+
+ hk_obese_fungi_bacteria_genus_p <- hk_obese_fungi_bacteria_genus_one_sided1
+ hk_obese_fungi_bacteria_genus_p[lower.tri(hk_obese_fungi_bacteria_genus_p, diag = TRUE)] <- NA
+hk_obese_fungi_bacteria_genus_p <- as.data.frame(as.table(hk_obese_fungi_bacteria_genus_p))
+ hk_obese_fungi_bacteria_genus_p2  <- na.omit(hk_obese_fungi_bacteria_genus_p)
+ names(hk_obese_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")
+ hk_obese_fungi_bacteria_genus.out <- merge(hk_obese_fungi_bacteria_genus_co,hk_obese_fungi_bacteria_genus_p2)
+ hk_obese_fungi_bacteria_genus.out <- hk_obese_fungi_bacteria_genus.out[order(-abs(hk_obese_fungi_bacteria_genus.out$Correlation)),]
+ write.table(hk_obese_fungi_bacteria_genus.out, file="genus/hk_obese/data/hk_obese_fungi_bacteria_genus_correlation.txt", sep = "\t",dec=".",row.names = F)
+
+#km_lean
+
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/km_lean/km_lean_fungi_bacteria_genus_norm.txt -c km_lean_fungi_bacteria_genus_sparcc.txt -v km_lean_fungi_bacteria_genus_cov_sparcc.txt 
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/km_lean/km_lean_fungi_bacteria_genus_norm.txt -p simulated_km_lean_fungi_bacteria_genus/ -t permuted_#
+  mkdir boot_km_lean_fungi_bacteria_genus_corr
+ mkdir boot_km_lean_fungi_bacteria_genus_cov
+ for i in `seq 0 99`; 
+do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_lean_fungi_bacteria_genus/permuted_$i -c boot_km_lean_fungi_bacteria_genus_corr/simulated_sparcc_$i.txt -v boot_km_lean_fungi_bacteria_genus_cov/simulated_sparcc_$i.txt  km_lean_fungi_bacteria_genus_boot_sparcc.log
+; done
+ mkdir km_lean_fungi_bacteria_genus_pvals
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_lean_fungi_bacteria_genus_sparcc.txt boot_km_lean_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o km_lean_fungi_bacteria_genus_pvals/km_lean_fungi_bacteria_genus_one_sided.txt -t one_sided
+in r
+ km_lean_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/km_lean/data/km_lean_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\t",check.names=F))
+ km_lean_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/km_lean/data/km_lean_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\t",check.names=F))
+ km_lean_fungi_bacteria_genus_merge<-
+list(km_lean_fungi_bacteria_genus_sparcc1,km_lean_fungi_bacteria_genus_one_sided1)
+corrplot(km_lean_fungi_bacteria_genus_merge[[1]],is.corr=FALSE,mar=c(6,0,0,4),cl.lim = c(-1, 1),p.mat=km_lean_fungi_bacteria_genus_merge[[2]],insig="blank",tl.cex=0.8,tl.col="black",tl.offset=0.5,cl.pos = "r",cl.offset=0.1,cl.cex=0.8,sig.level = 0.05)
+#calculating r and p value
+ km_lean_fungi_bacteria_genus_co<-km_lean_fungi_bacteria_genus_sparcc1
+ km_lean_fungi_bacteria_genus_co[lower.tri(km_lean_fungi_bacteria_genus_co,diag=TRUE)]<-NA
+ km_lean_fungi_bacteria_genus_co <- as.data.frame(as.table(km_lean_fungi_bacteria_genus_co))
+ km_lean_fungi_bacteria_genus_co <- na.omit(km_lean_fungi_bacteria_genus_co)
+ names(km_lean_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")
+ write.table(km_lean_fungi_bacteria_genus_co, file="genus/km_lean/data/km_lean_fungi_bacteria_genus_co.txt", sep = "\t",dec=".",row.names = F)
+
+km_lean_fungi_bacteria_genus_p <- km_lean_fungi_bacteria_genus_one_sided1 
+ km_lean_fungi_bacteria_genus_p[lower.tri(km_lean_fungi_bacteria_genus_p, diag = TRUE)] <- NA
+km_lean_fungi_bacteria_genus_p <- as.data.frame(as.table(km_lean_fungi_bacteria_genus_p))
+ km_lean_fungi_bacteria_genus_p2  <- na.omit(km_lean_fungi_bacteria_genus_p)
+ names(km_lean_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")
+ km_lean_fungi_bacteria_genus.out <- merge(km_lean_fungi_bacteria_genus_co,km_lean_fungi_bacteria_genus_p2)
+ km_lean_fungi_bacteria_genus.out <- km_lean_fungi_bacteria_genus.out[order(-abs(km_lean_fungi_bacteria_genus.out$Correlation)),]
+ write.table(km_lean_fungi_bacteria_genus.out, file="genus/km_lean/data/km_lean_fungi_bacteria_genus_correlation.txt", sep = "\t",dec=".",row.names = F)
+
+
+#km_obese
+
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/km_obese/km_obese_fungi_bacteria_genus_norm.txt -c km_obese_fungi_bacteria_genus_sparcc.txt -v km_obese_fungi_bacteria_genus_cov_sparcc.txt 
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/km_obese/km_obese_fungi_bacteria_genus_norm.txt -p simulated_km_obese_fungi_bacteria_genus/ -t permuted_#
+  mkdir boot_km_obese_fungi_bacteria_genus_corr
+ mkdir boot_km_obese_fungi_bacteria_genus_cov
+ for i in `seq 0 99`; 
+do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_obese_fungi_bacteria_genus/permuted_$i -c boot_km_obese_fungi_bacteria_genus_corr/simulated_sparcc_$i.txt -v boot_km_obese_fungi_bacteria_genus_cov/simulated_sparcc_$i.txt  km_obese_fungi_bacteria_genus_boot_sparcc.log
+; done
+ mkdir km_obese_fungi_bacteria_genus_pvals
+ python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_obese_fungi_bacteria_genus_sparcc.txt boot_km_obese_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o km_obese_fungi_bacteria_genus_pvals/km_obese_fungi_bacteria_genus_one_sided.txt -t one_sided
+in r
+ km_obese_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/km_obese/data/km_obese_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\t",check.names=F))
+ km_obese_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/km_obese/data/km_obese_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\t",check.names=F))
+ km_obese_fungi_bacteria_genus_merge<-
+list(km_obese_fungi_bacteria_genus_sparcc1,km_obese_fungi_bacteria_genus_one_sided1)
+corrplot(km_obese_fungi_bacteria_genus_merge[[1]],is.corr=FALSE,mar=c(6,0,0,4),cl.lim = c(-1, 1),p.mat=km_obese_fungi_bacteria_genus_merge[[2]],insig="blank",tl.cex=0.8,tl.col="black",tl.offset=0.5,cl.pos = "r",cl.offset=0.1,cl.cex=0.8,sig.level = 0.05)
+#caculating r and p value
+ km_obese_fungi_bacteria_genus_co<-km_obese_fungi_bacteria_genus_sparcc1
+ km_obese_fungi_bacteria_genus_co[lower.tri(km_obese_fungi_bacteria_genus_co,diag=TRUE)]<-NA
+ km_obese_fungi_bacteria_genus_co <- as.data.frame(as.table(km_obese_fungi_bacteria_genus_co))
+ km_obese_fungi_bacteria_genus_co <- na.omit(km_obese_fungi_bacteria_genus_co)
+ names(km_obese_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")
+ write.table(km_obese_fungi_bacteria_genus_co, file="genus/km_obese/data/km_obese_fungi_bacteria_genus_co.txt", sep = "\t",dec=".",row.names = F)
+
+ km_obese_fungi_bacteria_genus_p <- km_obese_fungi_bacteria_genus_one_sided1
+ km_obese_fungi_bacteria_genus_p[lower.tri(km_obese_fungi_bacteria_genus_p, diag = TRUE)] <- NA
+km_obese_fungi_bacteria_genus_p <- as.data.frame(as.table(km_obese_fungi_bacteria_genus_p))
+ km_obese_fungi_bacteria_genus_p2  <- na.omit(km_obese_fungi_bacteria_genus_p)
+ names(km_obese_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")
+ km_obese_fungi_bacteria_genus.out <- merge(km_obese_fungi_bacteria_genus_co,km_obese_fungi_bacteria_genus_p2)
+ km_obese_fungi_bacteria_genus.out <- km_obese_fungi_bacteria_genus.out[order(-abs(km_obese_fungi_bacteria_genus.out$Correlation)),]
+ write.table(km_obese_fungi_bacteria_genus.out, file="genus/km_obese/data/km_obese_fungi_bacteria_genus_correlation.txt", sep = "\t",dec=".",row.names = F)
+
+#co-occurrence network
+
+library("igraph")
+library("psych")
+ tao_hms_km_species_norm <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/tao_hms_km_species_norm.csv",header=T,row.names=1)
+ otu<-t(tao_hms_km_fungi_bacteria_species_correlation)
+ write.table(otu, file="correlation/otu.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+ otu <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/otu.csv",row.names=1,header=T)
+ occor<-corr.test(otu,use="pairwise",method="spearman",adjust="fdr",alpha=0.5)
+
+ occor.r=occor$r
+ occor.p=occor$p
+ occor.r[occor.p0.05|abs(occor.r)<0.1] = 0 
+ igraph = graph_from_adjacency_matrix(occor.r,mode="undirected",weighted=TRUE,diag=FALSE)
+ igraph
+ occor.r[occor.r!=0] = 1
+ igraph = graph_from_adjacency_matrix(occor.r,mode="undirected",weighted=NULL,diag=FALSE)
+ bad.vs = V(igraph)[degree(igraph) == 0]
+ igraph = delete.vertices(igraph, bad.vs)
+ igraph
+ igraph.weight = E(igraph)$weight
+ E(igraph)$weight = NA
+ set.seed(123)
+ plot(igraph,main="Co-occurrence network",vertex.frame.color=NA,vetex.color="plum", vertex.label=NA,edge.width=1,vertex.size=5,edge.lty=1,edge.curved=TRUE,margin=c(0,0,0,0),layout=layout_in_circle)
+
+ bad.vs = V(igraph)[degree(igraph) == 0]
+ igraph = delete.vertices(igraph, bad.vs)
+ igraph
+ igraph.weight = E(igraph)$weight
+ E(igraph)$weight = NA
+ sum(igraph.weight0)# number of postive correlation
+[1] 142
+ sum(igraph.weight<0)# number of negative correlation
+[1] 0
+ E.color = igraph.weight
+ E.color = ifelse(E.color0, "red",ifelse(E.color<0, "blue","grey"))
+ E(igraph)$color = as.character(E.color)
+
+library(qgraph)
+library(vegan)
+library(MCL)
+library(SpiecEasi)
+hk_lean_fungi_bacteria_phylum_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/phylum/hk_lean/data/hk_lean_fungi_bacteria_phylum_norm.csv",row.names=1,header=T)
+
+# Get p-values
+pvals <- sapply(1:taxa,
+function(i) sapply(1:taxa, function(j)
+sum(MB.mat[i, j, 1]  MB.mat[i, j, 2:num_perms])))
+pvals <- pvals / num_perms
+# p-value correction
+pvals_BH <- array(p.adjust(pvals, method = "BH"),
+dim=c(nrow(pvals), ncol(pvals)))
+# Build adjacency matrix
+adj.mat <- ifelse(pvals_BH = (1 - sig_level), 1, 0)
+# Add names to rows & cols
+rownames(adj.mat) <- colnames(MB)
+colnames(adj.mat) <- colnames(MB)
+# Build and return the network
+graph <- graph.adjacency(adj.mat, mode = "undirected", diag = FALSE)
 }
+
+
+#FUNGuild
+
+python Guilds_v1.1.py -otu /lustre/project/SCNg/zhanhui/FUNGuild/km_hk_species_norm_otu_table.txt -db fungi -m -u
+ ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="groups",y="Saprotroph",add="jitter",ylabs="Saprotroph",color="groups")+labs(y="Saprotroph",x=NULL)+scale_color_jco()+stat_compare_means(method="anova",label.y=210,size=3.5)+geom_signif(comparisons = my_comparison,step_increase=0.25,map_signif_level = F,test = "wilcox.test")+border("black")+theme(axis.title.x = element_text(size = 16,face = "plain",color = "black"), axis.title.y = element_text(size = 16,face = "plain",color = "black"), axis.text = element_text(size = 16,face = "plain",color = "black"), legend.position = "none", legend.title = element_text(), legend.text = element_text(), panel.border = element_rect(color="black",linetype="solid",fill = NA,size = 1.2),panel.background = element_blank())
+
+#ploting
+ hk_lean_species_norm_otu_table.guilds_plot <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/FUNGuild/pie/hk_lean_species_norm_otu_table.guilds_plot.csv",row.names=1,header=T)
+ library(gridExtra)
+ library(ggplot2)
+ library("RColorBrewer")
+ ggplot(data = km_obese_species_norm_otu_table.guilds_plot, mapping = aes(x = factor(groups), fill = factor(function))) + geom_bar(stat = 'Relative_abundance', position = 'fill')
+ colourCount = length(unique(km_obese_species_norm_otu_table.guilds_plot$func))
+ getPalette = colorRampPalette(brewer.pal(9, "Set1"))
+
+ ggplot(data = km_lean_species_norm_otu_table.guilds_plot,mapping=aes(x=reorder(groups,Relative_abundance,decreasing = TRUE),y=Relative_abundance,fill=func))+geom_bar(stat= 'identity', position = 'fill',width = 1.6)+coord_polar(theta = 'x')+labs(x = '', y = '', title = '')+theme(legend.key.size = unit(0.5,"line"),axis.text = element_blank(),axis.title=element_blank(),axis.ticks = element_blank(),legend.title=element_blank(),legend.text = element_text(size = 8),panel.grid=element_blank(),panel.border=element_blank(),panel.background = element_blank())+scale_fill_manual(values = getPalette(colourCount))+scale_color_manual(values = getPalette(colourCount))+ theme(legend.position="bottom") +guides(fill=guide_legend(nrow=2))
+
+  ggplot(data = hk_lean_species_norm_otu_table.guilds_plot2,mapping=aes(x=reorder(groups,Relative_abundance),y=Relative_abundance,fill=func))+geom_bar(stat= 'identity', position = 'fill',width = 1.6)+coord_polar(theta = 'x')+guides(fill=FALSE)+theme(plot.title=element_text(family="Arial",colour="black",size=18,face="bold",hjust=0.5,vjust=-8),axis.text = element_blank(),axis.title=element_blank(),axis.ticks = element_blank(),panel.grid=element_blank(),panel.border=element_blank(),panel.background = element_blank())+scale_fill_manual(values = getPalette(colourCount))+scale_color_manual(values = getPalette(colourCount))+labs(title="Lean in HK")
+
+ ggplot(data = hk_obese_species_norm_otu_table.guilds_plot,mapping=aes(x=reorder(groups,Relative_abundance,decreasing = TRUE),y=Relative_abundance,fill=func))+geom_bar(stat= 'identity', position = 'fill',width = 1.5)+coord_polar(theta = 'x')+labs(x = '', y = '', title = 'hk_obese')+theme(legend.position="bottom") +guides(fill=guide_legend(nrow=2))+theme(legend.key.size = unit(0.5,"line"),axis.text = element_blank(),axis.title=element_blank(),axis.ticks = element_blank(),legend.title=element_blank(),legend.text = element_text(size = 8),panel.grid=element_blank(),panel.border=element_blank(),panel.background = element_blank())+scale_fill_manual(values = getPalette(colourCount))+scale_color_manual(values = getPalette(colourCount))
+
+ ggplot(data = km_obese_species_norm_otu_table.guilds_plot2,mapping=aes(x=reorder(groups,Relative_abundance),y=Relative_abundance,fill=func))+geom_bar(stat= 'identity', position = 'fill',width = 1.6)+coord_polar(theta = 'x')+theme(plot.title=element_text(family="Arial",colour="black",size=18,face="bold",hjust=0.5,vjust=-8),axis.text = element_blank(),axis.title=element_blank(),axis.ticks = element_blank(),panel.grid=element_blank(),panel.border=element_blank(),panel.background = element_blank(),legend.position = "right",legend.title = element_text(family="Arial",colour="black",size=16,face="bold"),legend.text =element_text(family="Arial",colour="black",size=14))+scale_fill_manual(values = getPalette(colourCount))+scale_color_manual(values = getPalette(colourCount))+labs(title="Obesity in KM")+guides(fill=guide_legend(title="Guilds",ncol =1))
+
+km_hk_species_norm_otu_table.guilds_plot <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/FUNGuild/km_hk_species_norm_otu_table.guilds_plot.csv",row.names=1,header=T)
+ library("ggplot2")
+ library("ggpubr")
+ library("ggsci")
+labels <- c(Hongkong = "HK", Kunming = "KM")
+
+my_comparisons<-list(c("Lean","Obese"))
+
+#epiphyte
+ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Epiphyte",add="jitter",palette ="lancet",color="obesity")+labs(y="Epiphyte",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=30,label.x=30,family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=5),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 10), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 10),axis.title.y = element_text(face = "bold", size = 10, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=50,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=15), strip.background = element_rect(colour="black",size=12,linetype="solid"))
+
+#plant pathogen
+ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Plant_pathogen",add="jitter",palette = "lancet",color="obesity")+labs(y="Plant pathogen",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=110,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+ylim(0,120)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))
+
+#plant saprotroph
+ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Plant_saprotroph",add="jitter",palette = "lancet",color="obesity")+labs(y="Plant saprotroph",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=35,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+ylim(0,40)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))
+
+#animal endosymbiont
+ ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Animal_endosymbiont",add="jitter",palette = "lancet",color="obesity")+labs(y="Animal endosymbiont",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=50,label.x=1.4,family = "Arial",colour="black",face="bold",size=15)+ylim(0,60)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 35), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 35),axis.title.y = element_text(face = "bold", size = 40, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=35,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(face="bold",size=30), strip.background = element_rect(colour="black",size=2,linetype="solid"))
+
+#soil saprotroph
+ ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Soil_saprotroph",add="jitter",palette ="lancet",color="obesity")+labs(y="Soil saprotroph",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=17,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+ylim(0,18)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))
+
+# wood saprotroph
+ ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Wood_saprotroph",add="jitter",palette ="lancet",color="obesity")+labs(y="Wood saprotroph",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=17,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+ylim(0,18)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))
+
+#dung_saprotroph
+ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Dung_saprotroph",add="jitter",palette ="lancet",color="obesity")+labs(y="Dung saprotroph",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=17,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+ylim(0,18)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))
+
+#endophyte
+ ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Endophyte",add="jitter",palette ="lancet",color="obesity")+labs(y="Endophyte",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=65,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))
+
+#animal pathogen
+ggboxplot(km_hk_species_norm_otu_table.guilds_plot,x="obesity",y="Animal_pathogen",add="jitter",palette ="lancet",color="obesity")+labs(y="Animal pathogen",x=NULL)+facet_grid(.~region,labeller=labeller(region=labels))+geom_point(aes(color=obesity),size=3)+stat_compare_means(comparisons = my_comparisons,method="t.test",aes(label=..p.format..),label.y=65,label.x=1.4,family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), legend.position="none",plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.x = element_text(size=16), strip.background = element_rect(colour="black",size=1.2,linetype="solid"))
+
+#ploting
+Cairo(file="Cairo_PNG_96_dpi.png", type="png”, units="in", width=5, height=4, pointsize=12, dpi=96, my_sc_plot(data)
+dev.off()
+plot<-ggboxplot(km_hk_species_norm_otu_table.guilds_plot_region2,x="sample",y="value",color="Region",add="jitter",palette ="jco")+labs(y="Relative abundance",x=NULL)+stat_compare_means(aes(group=Region),label="p.signif",method="t.test",label.y=50,family = "Arial",colour="black",face="bold",size=12)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial", face="bold",size = 18),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"), plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5),legend.text=element_text(size = 14, face = "bold",family="Arial",colour = "black"),legend.title=element_text(face = "bold", size = 16, family="Arial",colour = "black"))
+ggsave("plot.pdf",device=cairo_pdf,width=400,height=210,units="mm")
+
