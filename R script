@@ -129,18 +129,14 @@ superheatmap<-superheat (supermap2, scale=TRUE, membership.cols=groupcc,  pretty
 matrix<-data.matrix(heatmap2)
 superheat(matrix,scale=TRUE,pretty.order.cols=TRUE,pretty.order.rows = TRUE,heat.lim=c(-1,4),extreme.values.na = FALSE,row.dendrogram=TRUE,grid.hline.col="black",grid.vline="black",grid.hline.size=4,grid.vline.size=4,left.label.size=0.2,left.label.col="white",left.label.text.size=2,bottom.label="none")
 
-
-#Heatmap
-
+#Heatmap of fungal Composition at specieslevel
 library(circlize)
 library(ComplexHeatmap)
-
 myfun<-function(species_norm){sum(species_norm0.01)}
 apply(hk_norm,2,myfun)
 apply(hk_norm,1,myfun)
 heatmap1<-species_norm[as.logical(apply(species_norm,1,myfun)),]
 write.table(heatmap1, file="C:/users/dell/documents/r/hk/hk2/heatmap/heatmap1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
-
 nn<-216(216 is the number of lines)
 mm<-0.2（selecting the OTU present in 20% samples）
 mnn<-nn*mm
@@ -148,43 +144,26 @@ myfun<-function(x){sum(x!=0)}
 heatmap2<-km_genus_norm[(apply(genus_norm,1,myfun)=mnn),]
 write.table(heatmap2, file="C:/users/dell/documents/r/km/km2/heatmap/heatmap2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
-mycol <- colorRamp2(c(-2, 0, 6), c("blue", "white", "red"))
-mycol <-  colorRamp2(c(-2, -1, 0, 2), c("blue", "cornflowerblue", "yellow", "gold"))
-
-#adding grouping ornament
-
-
-#Comparison
- heatmap3 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/heatmap/heatmap3.csv",header=T)
-ha<-HeatmapAnnotation(df=data.frame(Obesity_type=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity_type = c("Obese" = "#c53333", "Lean" = "#2d72bf"),Region=c("Hong Kong"="#d87e29","Kunming"="#ad3ab4")),annotation_legend_param = list(title_gp = gpar(fontsize = 10), labels_gp = gpar(fontsize = 10),fontface = "bold"))
- matrix<-data.matrix(km_hk_heatmap2[,2:218])
- Heatmap(matrix,name="Color key",col=mycol, cluster_columns = FALSE, cluster_rows = FALSE,top_annotation=ha, heatmap_legend_param = list(direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_column_dend =T,show_row_names = TRUE,row_dend_side="left",row_names_gp=gpar(fontsize=7,fontface="italic",fontface="bold"))
- km_hk_heatmap_plot<-Heatmap(matrix,name="Color key",col=mycol, cluster_columns = FALSE, cluster_rows = FALSE,top_annotation=ha, heatmap_legend_param = list(direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_column_dend =T,show_row_names = TRUE,row_dend_side="left",row_names_gp=gpar(fontsize=7,fontface="italic",fontface="bold"))
- draw(km_hk_heatmap_plot, heatmap_legend_side = "bottom", annotation_legend_side = "right") 
-mycol <- colorRamp2(c(0, 0.5, 5), c("#377EB8","white","#E41A1C"))
 heatmap5 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/heatmap/heatmap5.csv",row.names=1,header=T)
- matrix<-data.matrix(km_hk_heatmap5[,1:217])
- library("RColorBrewer")
- library("circlize")
- library(ComplexHeatmap)
- mycol <-  colorRamp2(c(1,2,3,4,5),brewer.pal(5, "RdYlBu")[2:6])
- split = data.frame(c(rep("HK",118),rep("KM",99)))`
- ha<-HeatmapAnnotation(df=data.frame(Obesity=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity = c("Obese" = "#FF4500", "Lean" = "#3B4992FF"),Region=c("Hong Kong"="#FFBECD","Kunming"="#91D1C2B2")),annotation_legend_param = list(title_gp = gpar(fontsize = 14,fontface="bold"), labels_gp = gpar(fontsize = 12),width = unit(4, "cm")))
-
- km_hk_heatmap_plot<-Heatmap(matrix,name="Color key",col=mycol,column_split = split, column_title=NULL,cluster_columns = FALSE, column_gap = unit(3, "mm"),cluster_rows = T,row_dend_side="left",clustering_distance_columns = "pearson",top_annotation=ha,heatmap_legend_param = list(title="",direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_row_names = TRUE,row_names_gp=gpar(fontsize=8,fontface="italic",fontface="bold"))
-
- draw(km_hk_heatmap_plot, heatmap_legend_side = "bottom", annotation_legend_side = "right") 
+matrix<-data.matrix(km_hk_heatmap5[,1:217])
+library("RColorBrewer")
+library("circlize")
+library(ComplexHeatmap)
+mycol <-  colorRamp2(c(1,2,3,4,5),brewer.pal(5, "RdYlBu")[2:6])
+split = data.frame(c(rep("HK",118),rep("KM",99)))`
+ha<-HeatmapAnnotation(df=data.frame(Obesity=c(rep("Lean",63),rep("Obese",55),rep("Lean",49),rep("Obese",50)),Region=c(rep("Hong Kong",118),rep("Kunming",99))),col = list(Obesity = c("Obese" = "#FF4500", "Lean" = "#3B4992FF"),Region=c("Hong Kong"="#FFBECD","Kunming"="#91D1C2B2")),annotation_legend_param = list(title_gp = gpar(fontsize = 14,fontface="bold"), labels_gp = gpar(fontsize = 12),width = unit(4, "cm")))
+km_hk_heatmap_plot<-Heatmap(matrix,name="Color key",col=mycol,column_split = split, column_title=NULL,cluster_columns = FALSE, column_gap = unit(3, "mm"),cluster_rows = T,row_dend_side="left",clustering_distance_columns = "pearson",top_annotation=ha,heatmap_legend_param = list(title="",direction = "horizontal",legend_width = unit(8, "cm")),show_column_names = F,show_row_names = TRUE,row_names_gp=gpar(fontsize=8,fontface="italic",fontface="bold"))
+draw(km_hk_heatmap_plot, heatmap_legend_side = "bottom", annotation_legend_side = "right") 
 
 #Lefse
- setwd("D:/phd/fungi analysis/HMS/hui's results/results/Lefse")
- hk_km_biomarker <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker.csv")
- View(hk_km_biomarker)
- hk_km_biomarker <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker.csv",header=T)
- library("reshape2")
- hk_km_biomarker_melt <- melt(hk_km_biomarker, id.vars=c("id","Region","Obesity"), measure.vars=grep("s_", names(hk_km_biomarker), val=T),variable.name="species",value.name="value")
- write.table(hk_km_biomarker_melt,file="D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker_melt.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+hk_km_biomarker <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker.csv")
+View(hk_km_biomarker)
+hk_km_biomarker <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker.csv",header=T)
+library("reshape2")
+hk_km_biomarker_melt <- melt(hk_km_biomarker, id.vars=c("id","Region","Obesity"), measure.vars=grep("s_", names(hk_km_biomarker), val=T),variable.name="species",value.name="value")
+write.table(hk_km_biomarker_melt,file="D:/phd/fungi analysis/HMS/hui's results/results/Lefse/hk_km_biomarker_melt.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 #ploting 
- ggboxplot(hk_km_biomarker,x="Bacteria",y="Log10+1",add="jitter",color="Obesity",palette = "lancet")+labs(y=expression(Log[10]~"Relative abundance"),x=NULL)+stat_compare_means(aes(group = Obesity,label=..p.signif..),hide.ns = TRUE,label.y= 2,method = "wilcox.test",family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+ylim(-0.5,2.5)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 10,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+scale_x_discrete(limits=c("Candida_dubliniensis","Cryptococcus_neoformans","Lachancea_thermotolerans","Myceliophthora_thermophila","Parastagonospora_nodorum","Saccharomyces_paradoxus","Schizosaccharomyces_pombe"),breaks = c("Candida_dubliniensis","Cryptococcus_neoformans","Lachancea_thermotolerans","Myceliophthora_thermophila","Parastagonospora_nodorum","Saccharomyces_paradoxus","Schizosaccharomyces_pombe"),labels = c("Candida dubliniensis","Cryptococcus neoformans","Lachancea thermotolerans","Myceliophthora thermophila","Parastagonospora nodorum","Saccharomyces paradoxus","Schizosaccharomyces pombe"))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))
+ggboxplot(hk_km_biomarker,x="Bacteria",y="Log10+1",add="jitter",color="Obesity",palette = "lancet")+labs(y=expression(Log[10]~"Relative abundance"),x=NULL)+stat_compare_means(aes(group = Obesity,label=..p.signif..),hide.ns = TRUE,label.y= 2,method = "wilcox.test",family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+ylim(-0.5,2.5)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 10,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+scale_x_discrete(limits=c("Candida_dubliniensis","Cryptococcus_neoformans","Lachancea_thermotolerans","Myceliophthora_thermophila","Parastagonospora_nodorum","Saccharomyces_paradoxus","Schizosaccharomyces_pombe"),breaks = c("Candida_dubliniensis","Cryptococcus_neoformans","Lachancea_thermotolerans","Myceliophthora_thermophila","Parastagonospora_nodorum","Saccharomyces_paradoxus","Schizosaccharomyces_pombe"),labels = c("Candida dubliniensis","Cryptococcus neoformans","Lachancea thermotolerans","Myceliophthora thermophila","Parastagonospora nodorum","Saccharomyces paradoxus","Schizosaccharomyces pombe"))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))
 
 
 #the effect of medication and T2DM on gut mycobiome
@@ -217,7 +196,7 @@ M<-as.matrix(bmi_correlation2$cor)
 #Selecting the lines that values <0.01
  myfun<-function(tao_hms_km_bacteria_species_norm){sum(tao_hms_km_bacteria_species_norm0.01)}
  apply(tao_hms_km_bacteria_species_norm,2,myfun)
- apply(tao_hms_km_bacteria_species_norm,1,myfun)
+apply(tao_hms_km_bacteria_species_norm,1,myfun)
 tao_hms_km_bacteria_species_norm1<-tao_hms_km_bacteria_species_norm[as.logical(apply(tao_hms_km_bacteria_species_norm,1,myfun)),]
  write.table(tao_hms_km_bacteria_species_norm1, file="correlation/tao_hms_km_bacteria_species_norm1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
  tao_hms_km_bacteria_species1 <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_km_bacteria_species1.csv",row.names=1,header=T)
