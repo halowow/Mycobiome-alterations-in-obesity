@@ -109,7 +109,6 @@ dev.off()
  
 
 #Superheat
-
 #selecting lines that value<0.01
 myfun<-function(hk_norm){sum(hk_norm0.01)}
 apply(hk_norm,2,myfun)
@@ -166,12 +165,6 @@ write.table(hk_km_biomarker_melt,file="D:/phd/fungi analysis/HMS/hui's results/r
 ggboxplot(hk_km_biomarker,x="Bacteria",y="Log10+1",add="jitter",color="Obesity",palette = "lancet")+labs(y=expression(Log[10]~"Relative abundance"),x=NULL)+stat_compare_means(aes(group = Obesity,label=..p.signif..),hide.ns = TRUE,label.y= 2,method = "wilcox.test",family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+ylim(-0.5,2.5)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 10,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+scale_x_discrete(limits=c("Candida_dubliniensis","Cryptococcus_neoformans","Lachancea_thermotolerans","Myceliophthora_thermophila","Parastagonospora_nodorum","Saccharomyces_paradoxus","Schizosaccharomyces_pombe"),breaks = c("Candida_dubliniensis","Cryptococcus_neoformans","Lachancea_thermotolerans","Myceliophthora_thermophila","Parastagonospora_nodorum","Saccharomyces_paradoxus","Schizosaccharomyces_pombe"),labels = c("Candida dubliniensis","Cryptococcus neoformans","Lachancea thermotolerans","Myceliophthora thermophila","Parastagonospora nodorum","Saccharomyces paradoxus","Schizosaccharomyces pombe"))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))
 
 
-#the effect of medication and T2DM on gut mycobiome
- diversity2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/paper/medication/diversity2.csv",header=T)
- ggboxplot(diversity2,x="sample",y="chao1",add="jitter",color="value",palette = "jama")+labs(y="Richness",x=NULL)+stat_compare_means(aes(group=value,label=..p.format..),label.y= 75,method = "t.test",family = "Arial",colour="black",face="bold",size=4)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 10,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))
-
- ggboxplot(diversity2,x="sample",y="shannon",add="jitter",color="value",palette = "jama")+labs(y="Diversity",x=NULL)+stat_compare_means(aes(group=value,label=..p.format..),label.y= 3.5,method = "t.test",family = "Arial",colour="black",face="bold",size=6)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+facet_grid(Region~.)+theme(panel.grid = element_blank(), panel.background = element_blank(),panel.border = element_rect(color="black",linetype="solid",fill = NA,size=1.2),plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))+theme(axis.text.y = element_text(colour = "black", face="bold",family="Arial",size = 14), axis.text.x = element_text(colour = "black",family="Arial",size = 18,face="bold",angle = 30, hjust = 1),axis.title.y = element_text(face = "bold", size = 18, family="Arial",colour = "black"),legend.position = "right",legend.title = element_blank(),legend.text =element_text(family="Arial",colour="black",size=14),plot.title = element_text(size=20,family="Arial",face="bold",hjust=0.5))+theme(strip.text.y = element_text(size=18,face="bold"), strip.background = element_rect(colour="black",size=1.2))+ylim(0,4)
-
 #The correlation between BMI and biomarker species
  library(Hmisc)
  cc<-rcorr(as.matrix(BMI),type ="spearman")
@@ -184,22 +177,21 @@ ggboxplot(hk_km_biomarker,x="Bacteria",y="Log10+1",add="jitter",color="Obesity",
          p = pmat[ut]
      )
  }
- bmi<-flattenCorrMatrix(cc$r, cc$P)
- write.csv(bmi, file ="bmi_correlation.csv")
+bmi<-flattenCorrMatrix(cc$r, cc$P)
+write.csv(bmi, file ="bmi_correlation.csv")
 M<-as.matrix(bmi_correlation2$cor)
- rownames(M) <- bmi_correlation2$column
- colnames(M) <- c("BMI")
- corrplot(M,method = "square",cl.lim = c(-0.3, 0.1))
+rownames(M) <- bmi_correlation2$column
+colnames(M) <- c("BMI")
+corrplot(M,method = "square",cl.lim = c(-0.3, 0.1))
 
 #Correlation between bacteriome and mycobiome (cor.test+corplot)
 
 #Selecting the lines that values <0.01
- myfun<-function(tao_hms_km_bacteria_species_norm){sum(tao_hms_km_bacteria_species_norm0.01)}
- apply(tao_hms_km_bacteria_species_norm,2,myfun)
+myfun<-function(tao_hms_km_bacteria_species_norm){sum(tao_hms_km_bacteria_species_norm0.01)}
 apply(tao_hms_km_bacteria_species_norm,1,myfun)
 tao_hms_km_bacteria_species_norm1<-tao_hms_km_bacteria_species_norm[as.logical(apply(tao_hms_km_bacteria_species_norm,1,myfun)),]
- write.table(tao_hms_km_bacteria_species_norm1, file="correlation/tao_hms_km_bacteria_species_norm1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
- tao_hms_km_bacteria_species1 <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_km_bacteria_species1.csv",row.names=1,header=T)
+write.table(tao_hms_km_bacteria_species_norm1, file="correlation/tao_hms_km_bacteria_species_norm1.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+tao_hms_km_bacteria_species1 <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_km_bacteria_species1.csv",row.names=1,header=T)
 
 #Selecting the OTU contained in 20% of the sample
 nn<-96
@@ -249,7 +241,6 @@ corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",p.mat=res1$P,insig="label
 kunming_obese_correlation<-corrplot(tao_hms_bacteria.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,tl.offset = 1.5,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title=“Obese",mar=c(0,0,5,0))
 kunming_lean_correlation<-corrplot(tao_hms_bacteria_lean.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title=title,mar=c(0,0,5,0),tl.pos="ld")
 #Export picture
-install.packages("Cairo","https://www.rdocumentation.org/packages/Cairo/versions/1.5-10/topics/Cairo")
 library("Cairo")
 Cairo.capabilities()
  tao_hms_bacteria_obese.cor<-cor(tao_hms_fungi_bacteria_correlation[1:48,3:8],method = c("spearman"))
@@ -281,7 +272,6 @@ tao_hms_bacteria_lean.cor<-cor(tao_hms_fungi_bacteria_correlation[49:96,3:8],met
 
 #km_lean
  corrplot(km_lean_microbiome_mybiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 30,diag=F,p.mat=res1$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 1,title="(A) km_lean",mar=c(0,0,1,0),tl.pos="ld",cl.pos = "n")
-
 
 #Intra-kingdom
 
