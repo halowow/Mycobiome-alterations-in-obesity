@@ -240,36 +240,36 @@ tao_hms_km_bacteria_species_norm1<-tao_hms_km_bacteria_species_norm[as.logical(a
  tao_hms_km_bacteria_species1 <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_km_bacteria_species1.csv",row.names=1,header=T)
 
 #Selecting the OTU contained in 20% of the sample
- nn<-96
- mm<-0.2
- mnn<-nn*mm
- myfun<-function(tao_hms_km_bacteria_species1){sum(tao_hms_km_bacteria_species1!=0)}
+nn<-96
+mm<-0.2
+mnn<-nn*mm
+myfun<-function(tao_hms_km_bacteria_species1){sum(tao_hms_km_bacteria_species1!=0)}
 
- tao_hms_km_bacteria_species2<-tao_hms_km_bacteria_species1[(apply(tao_hms_km_bacteria_species1,1,myfun)=mnn),]
- write.table(tao_hms_km_bacteria_species2, file="correlation/tao_hms_km_bacteria_species2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+tao_hms_km_bacteria_species2<-tao_hms_km_bacteria_species1[(apply(tao_hms_km_bacteria_species1,1,myfun)=mnn),]
+write.table(tao_hms_km_bacteria_species2, file="correlation/tao_hms_km_bacteria_species2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 
 #cor.test
- tao_hms_fungi_bacteria_correlation <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_fungi_bacteria_correlation.csv",row.names=1,header=T,sep=",")
- tao_hms_bacteria.cor<-cor(tao_hms_fungi_bacteria_correlation[1:48,3:8],method = c("spearman"))
- install.packages("Hmisc")
- library("Hmisc")
- install.packages("corrplot")
+tao_hms_fungi_bacteria_correlation <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_fungi_bacteria_correlation.csv",row.names=1,header=T,sep=",")
+tao_hms_bacteria.cor<-cor(tao_hms_fungi_bacteria_correlation[1:48,3:8],method = c("spearman"))
+install.packages("Hmisc")
+library("Hmisc")
+install.packages("corrplot")
 
 #After calculating mycobiome，microbiome的diversity, evenness and richness values，we assess the correlation and plot
- hk_lean_mycobiome_microbiome <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/microbiome_mycobiome/hk_lean/hk_lean_mycobiome_microbiome.csv",row.names=1,header=T)
- hk_lean_mycobiome_microbiome_cor<-cor(hk_lean_mycobiome_microbiome[1:63,],method = c("spearman"))
- library(corrplot)
+hk_lean_mycobiome_microbiome <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/microbiome_mycobiome/hk_lean/hk_lean_mycobiome_microbiome.csv",row.names=1,header=T)
+hk_lean_mycobiome_microbiome_cor<-cor(hk_lean_mycobiome_microbiome[1:63,],method = c("spearman"))
+library(corrplot)
 #To calculate r and p value with package ‘rcorr’
 library(Hmisc)
- res1$r 
- res1$P
+res1$r 
+res1$P
 
-- res1<-rcorr(as.matrix(hk_lean_mycobiome_microbiome))
- # flattenCorrMatrix
- # ++++++++++++++++++++++++++++
- # cormat : matrix of the correlation coefficients
- # pmat : matrix of the correlation p-values
- flattenCorrMatrix <- function(cormat, pmat) {
+res1<-rcorr(as.matrix(hk_lean_mycobiome_microbiome))
+# flattenCorrMatrix
+# ++++++++++++++++++++++++++++
+# cormat : matrix of the correlation coefficients
+# pmat : matrix of the correlation p-value
+flattenCorrMatrix <- function(cormat, pmat) {
      ut <- upper.tri(cormat)
      data.frame(
          row = rownames(cormat)[row(cormat)[ut]],
@@ -278,10 +278,10 @@ library(Hmisc)
          p = pmat[ut]
      )
  }
- z1<-flattenCorrMatrix(res1$r, res1$P)
- write.csv(z1, file = "correlation/microbiome_mycobiome/hk_lean/hk_lean_fb_correlation.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+z1<-flattenCorrMatrix(res1$r, res1$P)
+write.csv(z1, file = "correlation/microbiome_mycobiome/hk_lean/hk_lean_fb_correlation.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
 #ploting 
- corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 45,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9,title="hk_lean",mar=c(0,0,3,0),tl.pos="ld")
+corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 45,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9,title="hk_lean",mar=c(0,0,3,0),tl.pos="ld")
 corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",p.mat=res1$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9)
 
 kunming_obese_correlation<-corrplot(tao_hms_bacteria.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,tl.offset = 1.5,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title=“Obese",mar=c(0,0,5,0))
