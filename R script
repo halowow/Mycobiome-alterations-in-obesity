@@ -184,6 +184,7 @@ rownames(M) <- bmi_correlation2$column
 colnames(M) <- c("BMI")
 corrplot(M,method = "square",cl.lim = c(-0.3, 0.1))
 
+
 #Correlation between bacteriome and mycobiome (cor.test+corplot)
 
 #Selecting the lines that values <0.01
@@ -205,9 +206,7 @@ write.table(tao_hms_km_bacteria_species2, file="correlation/tao_hms_km_bacteria_
 #cor.test
 tao_hms_fungi_bacteria_correlation <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/tao_hms_fungi_bacteria_correlation.csv",row.names=1,header=T,sep=",")
 tao_hms_bacteria.cor<-cor(tao_hms_fungi_bacteria_correlation[1:48,3:8],method = c("spearman"))
-install.packages("Hmisc")
 library("Hmisc")
-install.packages("corrplot")
 
 #After calculating mycobiome，microbiome的diversity, evenness and richness values，we assess the correlation and plot
 hk_lean_mycobiome_microbiome <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/microbiome_mycobiome/hk_lean/hk_lean_mycobiome_microbiome.csv",row.names=1,header=T)
@@ -238,6 +237,7 @@ write.csv(z1, file = "correlation/microbiome_mycobiome/hk_lean/hk_lean_fb_correl
 corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 45,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9,title="hk_lean",mar=c(0,0,3,0),tl.pos="ld")
 corrplot(hk_lean_mycobiome_microbiome_cor,type="lower",p.mat=res1$P,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = 0.9)
 
+#testing
 kunming_obese_correlation<-corrplot(tao_hms_bacteria.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,tl.offset = 1.5,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title=“Obese",mar=c(0,0,5,0))
 kunming_lean_correlation<-corrplot(tao_hms_bacteria_lean.cor,type="lower",tl.cex=0.8,tl.col="black",tl.srt = 15,diag=F,p.mat=res1$p,insig="label_sig",sig.level=c(0.001,0.01,0.05),pch.col = "white",pch.cex = .9,title=title,mar=c(0,0,5,0),tl.pos="ld")
 #Export picture
@@ -275,10 +275,10 @@ tao_hms_bacteria_lean.cor<-cor(tao_hms_fungi_bacteria_correlation[49:96,3:8],met
 
 #Intra-kingdom
 
- zh_km_HMS_species_abundance_all_final <- read.csv("D:/phd/fungi analysis/HMS/hui's results/yunnan/zh_km_HMS_species_abundance_all_final.txt",sep="\t")
- zh_km_HMS_phylum<-zh_km_HMS_species_abundance_all_final[,c(2,8:106)]
- library("plyr")
- zh_km_HMS_phylum2<-ddply(zh_km_HMS_phylum,"phylum",numcolwise(sum))
+zh_km_HMS_species_abundance_all_final <- read.csv("D:/phd/fungi analysis/HMS/hui's results/yunnan/zh_km_HMS_species_abundance_all_final.txt",sep="\t")
+zh_km_HMS_phylum<-zh_km_HMS_species_abundance_all_final[,c(2,8:106)]
+library("plyr")
+zh_km_HMS_phylum2<-ddply(zh_km_HMS_phylum,"phylum",numcolwise(sum))
 
 # Filter out OTUs that have less than 2 reads on average
 zh_km_HMS_species_norm_obese <- read.csv("D:/phd/fungi analysis/HMS/hui's results/yunnan/correlation/zh_km_HMS_species_norm_obese.csv",header=TRUE,row.names=1)
@@ -289,257 +289,257 @@ write.table (zh_km_HMS_species_norm_lean2, file="hui's results/yunnan/correlatio
 
 # SparCC
 
- python SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/zh_km_HMS_species_norm_lean3.txt -c zh_km_HMS_lean_sparcc.txt -v zh_km_HMS_lean_cov_sparcc.txt 
- python MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/zh_km_HMS_species_norm_lean3.txt -p simulated_zh_km_HMS_lean/ -t permuted_#
-  mkdir boot_zh_km_HMS_lean_corr
- mkdir boot_zh_km_HMS_lean_cov
- for i in `seq 0 99`; do python SparCC.py simulated_zh_km_HMS_lean/permuted_$i -c boot_zh_km_HMS_lean_corr/simulated_sparcc_$i.txt -v boot_zh_km_HMS_lean_cov/simulated_sparcc_$i.txt  zh_km_HMS_lean_boot_sparcc.log
+python SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/zh_km_HMS_species_norm_lean3.txt -c zh_km_HMS_lean_sparcc.txt -v zh_km_HMS_lean_cov_sparcc.txt 
+python MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/zh_km_HMS_species_norm_lean3.txt -p simulated_zh_km_HMS_lean/ -t permuted_#
+mkdir boot_zh_km_HMS_lean_corr
+mkdir boot_zh_km_HMS_lean_cov
+for i in `seq 0 99`; do python SparCC.py simulated_zh_km_HMS_lean/permuted_$i -c boot_zh_km_HMS_lean_corr/simulated_sparcc_$i.txt -v boot_zh_km_HMS_lean_cov/simulated_sparcc_$i.txt  zh_km_HMS_lean_boot_sparcc.log
 ; done
- mkdir zh_km_HMS_lean_pvals
- python PseudoPvals.py zh_km_HMS_lean_sparcc.txt boot_zh_km_HMS_lean_corr/simulated_sparcc_#.txt 100 -o zh_km_HMS_lean_pvals/one_sided.txt -t one_sided
+mkdir zh_km_HMS_lean_pvals
+python PseudoPvals.py zh_km_HMS_lean_sparcc.txt boot_zh_km_HMS_lean_corr/simulated_sparcc_#.txt 100 -o zh_km_HMS_lean_pvals/one_sided.txt -t one_sided
 
 # editing in R
- controls.corr <- as.matrix(read.table("data/controls_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- hk_HMS_lean_sparcc <- as.matrix(read.table("tao's results/correlation/hk_HMS_lean/hk_HMS_lean_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- hk_HMS_lean_one_sided <- as.matrix(read.table("tao's results/correlation/hk_HMS_lean/one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- zh_km_HMS_lean.1<-list(zh_km_HMS_lean_sparcc,zh_km_HMS_lean_one_sided)
- corrplot(zh_km_HMS_lean.1[[1]],type="lower",order="FPC",p.mat=zh_km_HMS_lean.1[[2]],sig.level=0.05,insig="blank",tl.pos="n",diag=F,cl.pos="r")
+controls.corr <- as.matrix(read.table("data/controls_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+hk_HMS_lean_sparcc <- as.matrix(read.table("tao's results/correlation/hk_HMS_lean/hk_HMS_lean_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+hk_HMS_lean_one_sided <- as.matrix(read.table("tao's results/correlation/hk_HMS_lean/one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+zh_km_HMS_lean.1<-list(zh_km_HMS_lean_sparcc,zh_km_HMS_lean_one_sided)
+corrplot(zh_km_HMS_lean.1[[1]],type="lower",order="FPC",p.mat=zh_km_HMS_lean.1[[2]],sig.level=0.05,insig="blank",tl.pos="n",diag=F,cl.pos="r")
 
- zh_km_HMS_lean_sparcc <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/yunnan/correlation/zh_km_HMS_lean/zh_km_HMS_lean_sparcc.txt",header = T, row.names = 1, sep = "\t"))
- hk_HMS_lean.all<-hk_HMS_lean_sparcc
- hk_HMS_lean.all[lower.tri(hk_HMS_lean.all,diag=TRUE)]<-NA
- hk_HMS_lean.all <- as.data.frame(as.table(hk_HMS_lean.all))
- hk_HMS_lean.all <- na.omit(hk_HMS_lean.all)
- names(hk_HMS_lean.all) <- c("Var1", "Var2", "Correlation")
- write.table(hk_HMS_lean.all, file="tao's results/correlation/hk_HMS_lean/hk_HMS_lean_all.txt", sep = "\t", row.names = F)
- zh_km_HMS_lean_p <- zh_km_HMS_lean_one_sided 
- zh_km_HMS_lean_p[lower.tri(zh_km_HMS_lean_p, diag = TRUE)] <- NA
- zh_km_HMS_lean_p <- as.data.frame(as.table(zh_km_HMS_lean_p))
- zh_km_HMS_lean_p  <- na.omit(zh_km_HMS_lean_p)
- names(zh_km_HMS_lean_p) <- c("Var1", "Var2", "p")
- zh_km_HMS_lean.out <- merge(zh_km_HMS_lean, zh_km_HMS_lean_p)
- zh_km_HMS_lean.out <- zh_km_HMS_lean.out[order(-abs(zh_km_HMS_lean.out$Correlation)),]
- write.table(zh_km_HMS_obese.out, file="hui's results/yunnan/correlation/zh_km_HMS_lean/zh_km_HMS_lean_correlation.txt", sep = "\t", row.names = F)
+zh_km_HMS_lean_sparcc <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/yunnan/correlation/zh_km_HMS_lean/zh_km_HMS_lean_sparcc.txt",header = T, row.names = 1, sep = "\t"))
+hk_HMS_lean.all<-hk_HMS_lean_sparcc
+hk_HMS_lean.all[lower.tri(hk_HMS_lean.all,diag=TRUE)]<-NA
+hk_HMS_lean.all <- as.data.frame(as.table(hk_HMS_lean.all))
+hk_HMS_lean.all <- na.omit(hk_HMS_lean.all)
+names(hk_HMS_lean.all) <- c("Var1", "Var2", "Correlation")
+write.table(hk_HMS_lean.all, file="tao's results/correlation/hk_HMS_lean/hk_HMS_lean_all.txt", sep = "\t", row.names = F)
+zh_km_HMS_lean_p <- zh_km_HMS_lean_one_sided 
+zh_km_HMS_lean_p[lower.tri(zh_km_HMS_lean_p, diag = TRUE)] <- NA
+zh_km_HMS_lean_p <- as.data.frame(as.table(zh_km_HMS_lean_p))
+zh_km_HMS_lean_p  <- na.omit(zh_km_HMS_lean_p)
+names(zh_km_HMS_lean_p) <- c("Var1", "Var2", "p")
+zh_km_HMS_lean.out <- merge(zh_km_HMS_lean, zh_km_HMS_lean_p)
+zh_km_HMS_lean.out <- zh_km_HMS_lean.out[order(-abs(zh_km_HMS_lean.out$Correlation)),]
+write.table(zh_km_HMS_obese.out, file="hui's results/yunnan/correlation/zh_km_HMS_lean/zh_km_HMS_lean_correlation.txt", sep = "\t", row.names = F)
 
 # hk_lean
- hk_lean_fungi_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_lean/hk_lean_fungi_norm.csv",header=T,row.names=1)
- hk_lean_fungi_norm2<-hk_lean_fungi_norm[2:59,]
- hk_lean_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_lean/hk_lean_fungi_norm2.csv",row.names=1,header=T)
- hk_lean_fungi_norm4<-hk_lean_fungi_norm2[-which(rowMeans(hk_lean_fungi_norm2) < 2),]
- write.table(hk_lean_fungi_norm4, file="correlation/hk_lean/hk_lean_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py hk_lean_fungi_norm_lessthan2.txt -c hk_lean_fungi_norm_sparcc.txt -v hk_lean_fungi_cov_sparcc.txt 
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py hk_lean_fungi_norm_lessthan2.txt -p simulated_hk_lean_fungi/ -t permuted_#
- mkdir boot_hk_lean_fungi_norm_corr
- mkdir boot_hk_lean_fungi_norm_cov
- for i in `seq 0 99` 
- do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_lean_fungi/permuted_$i -c boot_hk_lean_fungi_norm_corr/simulated_sparcc_$i.txt -v boot_hk_lean_fungi_norm_cov/simulated_sparcc_$i.txt  hk_lean_fungi_norm_boot_sparcc.log
- done
- mkdir hk_lean_fungi_norm_pvals
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_lean_fungi_norm_sparcc.txt boot_hk_lean_fungi_norm_corr/simulated_sparcc_#.txt 100 -o hk_lean_fungi_norm_pvals/one_sided.txt -t one_sided
+hk_lean_fungi_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_lean/hk_lean_fungi_norm.csv",header=T,row.names=1)
+hk_lean_fungi_norm2<-hk_lean_fungi_norm[2:59,]
+hk_lean_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_lean/hk_lean_fungi_norm2.csv",row.names=1,header=T)
+hk_lean_fungi_norm4<-hk_lean_fungi_norm2[-which(rowMeans(hk_lean_fungi_norm2) < 2),]
+write.table(hk_lean_fungi_norm4, file="correlation/hk_lean/hk_lean_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py hk_lean_fungi_norm_lessthan2.txt -c hk_lean_fungi_norm_sparcc.txt -v hk_lean_fungi_cov_sparcc.txt 
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py hk_lean_fungi_norm_lessthan2.txt -p simulated_hk_lean_fungi/ -t permuted_#
+mkdir boot_hk_lean_fungi_norm_corr
+mkdir boot_hk_lean_fungi_norm_cov
+for i in `seq 0 99` 
+do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_lean_fungi/permuted_$i -c boot_hk_lean_fungi_norm_corr/simulated_sparcc_$i.txt -v boot_hk_lean_fungi_norm_cov/simulated_sparcc_$i.txt  hk_lean_fungi_norm_boot_sparcc.log
+done
+mkdir hk_lean_fungi_norm_pvals
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_lean_fungi_norm_sparcc.txt boot_hk_lean_fungi_norm_corr/simulated_sparcc_#.txt 100 -o hk_lean_fungi_norm_pvals/one_sided.txt -t one_sided
 
 # editing in r
- hk_lean_fungi_norm_sparcc <-as.matrix(read.table("correlation/hk_lean/hk_lean_fungi_norm_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- hk_lean_one_sided <- as.matrix(read.table("correlation/hk_lean/hk_lean_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- hk_lean_fungi_merge<-list(hk_lean_fungi_norm_sparcc,hk_lean_one_sided)
+hk_lean_fungi_norm_sparcc <-as.matrix(read.table("correlation/hk_lean/hk_lean_fungi_norm_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+hk_lean_one_sided <- as.matrix(read.table("correlation/hk_lean/hk_lean_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+hk_lean_fungi_merge<-list(hk_lean_fungi_norm_sparcc,hk_lean_one_sided)
 corrplot(hk_lean_fungi_merge[[1]],type="lower",order="AOE",p.mat=hk_lean_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="hk_lean",cl.pos = "b")
 
 hk_lean_fungi_co<-hk_lean_fungi_norm_sparcc
- hk_lean_fungi_co[lower.tri(hk_lean_fungi_co,diag=TRUE)]<-NA
- hk_lean_fungi_co <- as.data.frame(as.table(hk_lean_fungi_co))
- hk_lean_fungi_co <- na.omit(hk_lean_fungi_co)
- names(hk_lean_fungi_co) <- c("Var1", "Var2", "Correlation")
- write.table(hk_lean_fungi_co, file="correlation/hk_lean/hk_lean_fungi_co.txt", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
- write.table(hk_lean_fungi_co, file="correlation/hk_lean/hk_lean_fungi_co.txt", sep = "\t",dec=".",row.names = F)
+hk_lean_fungi_co[lower.tri(hk_lean_fungi_co,diag=TRUE)]<-NA
+hk_lean_fungi_co <- as.data.frame(as.table(hk_lean_fungi_co))
+hk_lean_fungi_co <- na.omit(hk_lean_fungi_co)
+names(hk_lean_fungi_co) <- c("Var1", "Var2", "Correlation")
+write.table(hk_lean_fungi_co, file="correlation/hk_lean/hk_lean_fungi_co.txt", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+write.table(hk_lean_fungi_co, file="correlation/hk_lean/hk_lean_fungi_co.txt", sep = "\t",dec=".",row.names = F)
 
- hk_lean_fungi_p <- hk_lean_one_sided
- hk_lean_fungi_p[lower.tri(hk_lean_fungi_p, diag = TRUE)] <- NA
- hk_lean_fungi_p <- as.data.frame(as.table(hk_lean_fungi_p))
- hk_lean_fungi_p2  <- na.omit(hk_lean_fungi_p)
- names(hk_lean_fungi_p2) <- c("Var1", "Var2", "p")
- hk_lean_fungi.out <- merge(hk_lean_fungi_co, hk_lean_fungi_p2)
- hk_lean_fungi.out <- hk_lean_fungi.out[order(-abs(hk_lean_fungi.out$Correlation)),]
- write.table(hk_lean_fungi.out, file="correlation/hk_lean/hk_lean_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
+hk_lean_fungi_p <- hk_lean_one_sided
+hk_lean_fungi_p[lower.tri(hk_lean_fungi_p, diag = TRUE)] <- NA
+hk_lean_fungi_p <- as.data.frame(as.table(hk_lean_fungi_p))
+hk_lean_fungi_p2  <- na.omit(hk_lean_fungi_p)
+names(hk_lean_fungi_p2) <- c("Var1", "Var2", "p")
+hk_lean_fungi.out <- merge(hk_lean_fungi_co, hk_lean_fungi_p2)
+hk_lean_fungi.out <- hk_lean_fungi.out[order(-abs(hk_lean_fungi.out$Correlation)),]
+write.table(hk_lean_fungi.out, file="correlation/hk_lean/hk_lean_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
 
 #hk_obese
- hk_obese_fungi_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_obese/hk_obese_fungi_norm.csv",row.names=1,header=T)
- hk_obese_fungi_norm2<-hk_obese_fungi_norm[2:59,]
- hk_obese_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_obese/hk_obese_fungi_norm2.csv",row.names=1,header=T)
- hk_obese_fungi_norm4<-hk_obese_fungi_norm2[-which(rowMeans(hk_obese_fungi_norm2) < 2),]
- write.table(hk_obese_fungi_norm4, file="correlation/hk_obese/hk_obese_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py hk_obese_fungi_norm_lessthan2.txt -c hk_obese_fungi_sparcc.txt -v hk_obese_fungi_cov_sparcc.txt 
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py hk_obese_fungi_norm_lessthan2.txt -p simulated_hk_obese_fungi/ -t permuted_#
- mkdir boot_hk_obese_fungi_norm_corr
- mkdir boot_hk_obese_fungi_norm_cov
- for i in `seq 0 99` 
- do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_obese_fungi/permuted_$i -c boot_hk_obese_fungi_norm_corr/simulated_sparcc_$i.txt -v boot_hk_obese_fungi_norm_cov/simulated_sparcc_$i.txt  hk_obese_fungi_norm_boot_sparcc.log
- done
- mkdir hk_obese_fungi_pvals
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_obese_fungi_sparcc.txt boot_hk_obese_fungi_norm_corr/simulated_sparcc_#.txt 100 -o hk_obese_fungi_pvals/one_sided.txt -t one_sided
+hk_obese_fungi_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_obese/hk_obese_fungi_norm.csv",row.names=1,header=T)
+hk_obese_fungi_norm2<-hk_obese_fungi_norm[2:59,]
+hk_obese_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/hk_obese/hk_obese_fungi_norm2.csv",row.names=1,header=T)
+hk_obese_fungi_norm4<-hk_obese_fungi_norm2[-which(rowMeans(hk_obese_fungi_norm2) < 2),]
+write.table(hk_obese_fungi_norm4, file="correlation/hk_obese/hk_obese_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py hk_obese_fungi_norm_lessthan2.txt -c hk_obese_fungi_sparcc.txt -v hk_obese_fungi_cov_sparcc.txt 
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py hk_obese_fungi_norm_lessthan2.txt -p simulated_hk_obese_fungi/ -t permuted_#
+mkdir boot_hk_obese_fungi_norm_corr
+mkdir boot_hk_obese_fungi_norm_cov
+for i in `seq 0 99` 
+do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_obese_fungi/permuted_$i -c boot_hk_obese_fungi_norm_corr/simulated_sparcc_$i.txt -v boot_hk_obese_fungi_norm_cov/simulated_sparcc_$i.txt  hk_obese_fungi_norm_boot_sparcc.log
+done
+mkdir hk_obese_fungi_pvals
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_obese_fungi_sparcc.txt boot_hk_obese_fungi_norm_corr/simulated_sparcc_#.txt 100 -o hk_obese_fungi_pvals/one_sided.txt -t one_sided
 
 #editing in r
- hk_obese_fungi_sparcc <-as.matrix(read.table("correlation/hk_obese/hk_obese_fungi_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- hk_obese_one_sided <- as.matrix(read.table("correlation/hk_obese/hk_obese_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- hk_obese_fungi_merge<-list(hk_obese_fungi_sparcc,hk_obese_one_sided)
+hk_obese_fungi_sparcc <-as.matrix(read.table("correlation/hk_obese/hk_obese_fungi_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+hk_obese_one_sided <- as.matrix(read.table("correlation/hk_obese/hk_obese_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+hk_obese_fungi_merge<-list(hk_obese_fungi_sparcc,hk_obese_one_sided)
 corrplot(hk_obese_fungi_merge[[1]],type="lower",order="AOE",p.mat=hk_obese_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="hk_lean",cl.pos = "b")
 
 hk_obese_fungi_co<-hk_obese_fungi_sparcc
- hk_obese_fungi_co[lower.tri(hk_obese_fungi_co,diag=TRUE)]<-NA
- hk_obese_fungi_co <- as.data.frame(as.table(hk_obese_fungi_co))
- hk_obese_fungi_co <- na.omit(hk_obese_fungi_co)
- names(hk_obese_fungi_co) <- c("Var1", "Var2", "Correlation")
- write.table(hk_obese_fungi_co, file="correlation/hk_obese/hk_obese_fungi_co.txt", sep = "\t",dec=".",row.names = F)
+hk_obese_fungi_co[lower.tri(hk_obese_fungi_co,diag=TRUE)]<-NA
+hk_obese_fungi_co <- as.data.frame(as.table(hk_obese_fungi_co))
+hk_obese_fungi_co <- na.omit(hk_obese_fungi_co)
+names(hk_obese_fungi_co) <- c("Var1", "Var2", "Correlation")
+write.table(hk_obese_fungi_co, file="correlation/hk_obese/hk_obese_fungi_co.txt", sep = "\t",dec=".",row.names = F)
 
- hk_obese_fungi_p <- hk_obese_one_sided
- hk_obese_fungi_p[lower.tri(hk_obese_fungi_p, diag = TRUE)] <- NA
- hk_obese_fungi_p <- as.data.frame(as.table(hk_obese_fungi_p))
- hk_obese_fungi_p2  <- na.omit(hk_obese_fungi_p)
- names(hk_obese_fungi_p2) <- c("Var1", "Var2", "p")
- hk_obese_fungi.out <- merge(hk_obese_fungi_co, hk_obese_fungi_p2)
- hk_obese_fungi.out <- hk_obese_fungi.out[order(-abs(hk_obese_fungi.out$Correlation)),]
- write.table(hk_obese_fungi.out, file="correlation/hk_obese/hk_obese_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
+hk_obese_fungi_p <- hk_obese_one_sided
+hk_obese_fungi_p[lower.tri(hk_obese_fungi_p, diag = TRUE)] <- NA
+hk_obese_fungi_p <- as.data.frame(as.table(hk_obese_fungi_p))
+hk_obese_fungi_p2  <- na.omit(hk_obese_fungi_p)
+names(hk_obese_fungi_p2) <- c("Var1", "Var2", "p")
+hk_obese_fungi.out <- merge(hk_obese_fungi_co, hk_obese_fungi_p2)
+hk_obese_fungi.out <- hk_obese_fungi.out[order(-abs(hk_obese_fungi.out$Correlation)),]
+write.table(hk_obese_fungi.out, file="correlation/hk_obese/hk_obese_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
 
 #km_lean
- km_lean_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/km_lean/km_lean_fungi_norm2.csv",row.names=1,header=T)
- km_lean_fungi_norm4<-km_lean_fungi_norm2[-which(rowMeans(km_lean_fungi_norm2) < 2),]
- write.table(km_lean_fungi_norm4, file="correlation/km_lean/km_lean_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py km_lean_fungi_norm_lessthan2.txt -c km_lean_fungi_sparcc.txt -v km_lean_fungi_cov_sparcc.txt 
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py km_lean_fungi_norm_lessthan2.txt -p simulated_km_lean_fungi/ -t permuted_#
- mkdir boot_km_lean_fungi_corr
- mkdir boot_km_lean_fungi_cov
- for i in `seq 0 99` 
- do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_lean_fungi/permuted_$i -c boot_km_lean_fungi_corr/simulated_sparcc_$i.txt -v boot_km_lean_fungi_cov/simulated_sparcc_$i.txt  km_lean_fungi_boot_sparcc.log
- done
- mkdir km_lean_fungi_pvals
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_lean_fungi_sparcc.txt boot_km_lean_fungi_corr/simulated_sparcc_#.txt 100 -o km_lean_fungi_pvals/one_sided.txt -t one_sided
+km_lean_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/km_lean/km_lean_fungi_norm2.csv",row.names=1,header=T)
+km_lean_fungi_norm4<-km_lean_fungi_norm2[-which(rowMeans(km_lean_fungi_norm2) < 2),]
+write.table(km_lean_fungi_norm4, file="correlation/km_lean/km_lean_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py km_lean_fungi_norm_lessthan2.txt -c km_lean_fungi_sparcc.txt -v km_lean_fungi_cov_sparcc.txt 
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py km_lean_fungi_norm_lessthan2.txt -p simulated_km_lean_fungi/ -t permuted_#
+mkdir boot_km_lean_fungi_corr
+mkdir boot_km_lean_fungi_cov
+for i in `seq 0 99` 
+do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_lean_fungi/permuted_$i -c boot_km_lean_fungi_corr/simulated_sparcc_$i.txt -v boot_km_lean_fungi_cov/simulated_sparcc_$i.txt  km_lean_fungi_boot_sparcc.log
+done
+mkdir km_lean_fungi_pvals
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_lean_fungi_sparcc.txt boot_km_lean_fungi_corr/simulated_sparcc_#.txt 100 -o km_lean_fungi_pvals/one_sided.txt -t one_sided
 
 #editing in r
- km_lean_fungi_sparcc <-as.matrix(read.table("correlation/km_lean/km_lean_fungi_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- km_lean_one_sided <- as.matrix(read.table("correlation/km_lean/km_lean_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- km_lean_fungi_merge<-list(km_lean_fungi_sparcc,km_lean_one_sided)
+km_lean_fungi_sparcc <-as.matrix(read.table("correlation/km_lean/km_lean_fungi_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+km_lean_one_sided <- as.matrix(read.table("correlation/km_lean/km_lean_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+km_lean_fungi_merge<-list(km_lean_fungi_sparcc,km_lean_one_sided)
 corrplot(km_lean_fungi_merge[[1]],type="lower",order="AOE",p.mat=km_lean_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="hk_lean",cl.pos = "b")
 
- km_lean_fungi_co<-km_lean_fungi_sparcc
- km_lean_fungi_co[lower.tri(km_lean_fungi_co,diag=TRUE)]<-NA
- km_lean_fungi_co <- as.data.frame(as.table(km_lean_fungi_co))
- km_lean_fungi_co <- na.omit(km_lean_fungi_co)
- names(km_lean_fungi_co) <- c("Var1", "Var2", "Correlation")
- write.table(km_lean_fungi_co, file="correlation/km_lean/km_lean_fungi_co.txt", sep = "\t",dec=".",row.names = F)
+km_lean_fungi_co<-km_lean_fungi_sparcc
+km_lean_fungi_co[lower.tri(km_lean_fungi_co,diag=TRUE)]<-NA
+km_lean_fungi_co <- as.data.frame(as.table(km_lean_fungi_co))
+km_lean_fungi_co <- na.omit(km_lean_fungi_co)
+names(km_lean_fungi_co) <- c("Var1", "Var2", "Correlation")
+write.table(km_lean_fungi_co, file="correlation/km_lean/km_lean_fungi_co.txt", sep = "\t",dec=".",row.names = F)
 
- km_lean_fungi_p <- km_lean_one_sided
- km_lean_fungi_p[lower.tri(km_lean_fungi_p, diag = TRUE)] <- NA
- km_lean_fungi_p <- as.data.frame(as.table(km_lean_fungi_p))
- km_lean_fungi_p2  <- na.omit(km_lean_fungi_p)
- names(km_lean_fungi_p2) <- c("Var1", "Var2", "p")
- km_lean_fungi.out <- merge(km_lean_fungi_co, km_lean_fungi_p2)
- km_lean_fungi.out <- km_lean_fungi.out[order(-abs(km_lean_fungi.out$Correlation)),]
- write.table(km_lean_fungi.out, file="correlation/km_lean/km_lean_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
+km_lean_fungi_p <- km_lean_one_sided
+km_lean_fungi_p[lower.tri(km_lean_fungi_p, diag = TRUE)] <- NA
+km_lean_fungi_p <- as.data.frame(as.table(km_lean_fungi_p))
+km_lean_fungi_p2  <- na.omit(km_lean_fungi_p)
+names(km_lean_fungi_p2) <- c("Var1", "Var2", "p")
+km_lean_fungi.out <- merge(km_lean_fungi_co, km_lean_fungi_p2)
+km_lean_fungi.out <- km_lean_fungi.out[order(-abs(km_lean_fungi.out$Correlation)),]
+write.table(km_lean_fungi.out, file="correlation/km_lean/km_lean_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
 
 #km_obese
- km_obese_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/km_obese/km_obese_fungi_norm2.csv",row.names=1,header=T)
- km_obese_fungi_norm4<-km_obese_fungi_norm2[-which(rowMeans(km_obese_fungi_norm2) < 2),]
- write.table(km_obese_fungi_norm4, file="correlation/km_obese/km_obese_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py km_obese_fungi_norm_lessthan2.txt -c km_obese_fungi_sparcc.txt -v km_obese_fungi_cov_sparcc.txt 
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py km_obese_fungi_norm_lessthan2.txt -p simulated_km_obese_fungi/ -t permuted_#
- mkdir boot_km_obese_fungi_corr
- mkdir boot_km_obese_fungi_cov
- for i in `seq 0 99` 
- do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_obese_fungi/permuted_$i -c boot_km_obese_fungi_corr/simulated_sparcc_$i.txt -v boot_km_obese_fungi_cov/simulated_sparcc_$i.txt  km_obese_fungi_boot_sparcc.log
- done
- mkdir km_obese_fungi_pvals
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_obese_fungi_sparcc.txt boot_km_obese_fungi_corr/simulated_sparcc_#.txt 100 -o km_obese_fungi_pvals/one_sided.txt -t one_sided
+km_obese_fungi_norm2 <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/km_obese/km_obese_fungi_norm2.csv",row.names=1,header=T)
+km_obese_fungi_norm4<-km_obese_fungi_norm2[-which(rowMeans(km_obese_fungi_norm2) < 2),]
+write.table(km_obese_fungi_norm4, file="correlation/km_obese/km_obese_fungi_norm_lessthan2.csv", sep = " ,",dec=".",col.names = TRUE,row.names = TRUE)
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py km_obese_fungi_norm_lessthan2.txt -c km_obese_fungi_sparcc.txt -v km_obese_fungi_cov_sparcc.txt 
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py km_obese_fungi_norm_lessthan2.txt -p simulated_km_obese_fungi/ -t permuted_#
+mkdir boot_km_obese_fungi_corr
+mkdir boot_km_obese_fungi_cov
+for i in `seq 0 99` 
+do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_km_obese_fungi/permuted_$i -c boot_km_obese_fungi_corr/simulated_sparcc_$i.txt -v boot_km_obese_fungi_cov/simulated_sparcc_$i.txt  km_obese_fungi_boot_sparcc.log
+done
+mkdir km_obese_fungi_pvals
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py km_obese_fungi_sparcc.txt boot_km_obese_fungi_corr/simulated_sparcc_#.txt 100 -o km_obese_fungi_pvals/one_sided.txt -t one_sided
 
 #editing in r
- km_obese_fungi_sparcc <-as.matrix(read.table("correlation/km_obese/km_obese_fungi_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- km_obese_one_sided <- as.matrix(read.table("correlation/km_obese/km_obese_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
- km_obese_fungi_merge<-list(km_obese_fungi_sparcc,km_obese_one_sided)
+km_obese_fungi_sparcc <-as.matrix(read.table("correlation/km_obese/km_obese_fungi_sparcc.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+km_obese_one_sided <- as.matrix(read.table("correlation/km_obese/km_obese_one_sided.txt", header = T, row.names = 1, sep = "\t", check.names = F))
+km_obese_fungi_merge<-list(km_obese_fungi_sparcc,km_obese_one_sided)
 corrplot(km_lean_fungi_merge[[1]],type="lower",order="AOE",p.mat=km_lean_fungi_merge[[2]],sig.level=0.05,insig="blank",tl.cex=0.7,tl.col="black",tl.srt =45,tl.offset=1,diag=F,mar=c(0,0,5,0),title="km_obese",cl.pos = "b")
 
- km_obese_fungi_co<-km_obese_fungi_sparcc
- km_obese_fungi_co[lower.tri(km_obese_fungi_co,diag=TRUE)]<-NA
- km_obese_fungi_co <- as.data.frame(as.table(km_obese_fungi_co))
- km_obese_fungi_co <- na.omit(km_obese_fungi_co)
- names(km_obese_fungi_co) <- c("Var1", "Var2", "Correlation")
- write.table(km_obese_fungi_co, file="correlation/km_obese/km_obese_fungi_co.txt", sep = "\t",dec=".",row.names = F)
+km_obese_fungi_co<-km_obese_fungi_sparcc
+km_obese_fungi_co[lower.tri(km_obese_fungi_co,diag=TRUE)]<-NA
+km_obese_fungi_co <- as.data.frame(as.table(km_obese_fungi_co))
+km_obese_fungi_co <- na.omit(km_obese_fungi_co)
+names(km_obese_fungi_co) <- c("Var1", "Var2", "Correlation")
+write.table(km_obese_fungi_co, file="correlation/km_obese/km_obese_fungi_co.txt", sep = "\t",dec=".",row.names = F)
 
- km_obese_fungi_p <- km_obese_one_sided
- km_obese_fungi_p[lower.tri(km_obese_fungi_p, diag = TRUE)] <- NA
- km_obese_fungi_p <- as.data.frame(as.table(km_obese_fungi_p))
- km_obese_fungi_p2  <- na.omit(km_obese_fungi_p)
- names(km_obese_fungi_p2) <- c("Var1", "Var2", "p")
- km_obese_fungi.out <- merge(km_obese_fungi_co, km_lean_fungi_p2)
- km_obese_fungi.out <- km_obese_fungi.out[order(-abs(km_obese_fungi.out$Correlation)),]
- write.table(km_obese_fungi.out, file="correlation/km_obese/km_obese_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
+km_obese_fungi_p <- km_obese_one_sided
+km_obese_fungi_p[lower.tri(km_obese_fungi_p, diag = TRUE)] <- NA
+km_obese_fungi_p <- as.data.frame(as.table(km_obese_fungi_p))
+km_obese_fungi_p2  <- na.omit(km_obese_fungi_p)
+names(km_obese_fungi_p2) <- c("Var1", "Var2", "p")
+km_obese_fungi.out <- merge(km_obese_fungi_co, km_lean_fungi_p2)
+km_obese_fungi.out <- km_obese_fungi.out[order(-abs(km_obese_fungi.out$Correlation)),]
+write.table(km_obese_fungi.out, file="correlation/km_obese/km_obese_fungi_correlation.txt", sep = "\t",dec=".",row.names = F)
 
 Inter-kingdom correlation
 
- hk_lean_bacteria_genus_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_bacteria_genus_norm.csv",row.names=1,header=T)
- hk_lean_bacteria_genus_norm_less2 <- hk_lean_bacteria_genus_norm[-which(rowMeans(hk_lean_bacteria_genus_norm) < 2),]
- write.table(hk_lean_bacteria_genus_norm_less2, file="genus/hk_lean/data/hk_lean_bacteria_genus_norm_less2.csv", sep = ",",dec=".",col.names = TRUE,row.names = TRUE)
+hk_lean_bacteria_genus_norm <- read.csv("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_bacteria_genus_norm.csv",row.names=1,header=T)
+hk_lean_bacteria_genus_norm_less2 <- hk_lean_bacteria_genus_norm[-which(rowMeans(hk_lean_bacteria_genus_norm) < 2),]
+write.table(hk_lean_bacteria_genus_norm_less2, file="genus/hk_lean/data/hk_lean_bacteria_genus_norm_less2.csv", sep = ",",dec=".",col.names = TRUE,row.names = TRUE)
 
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_lean/hk_lean_fungi_bacteria_genus_norm.txt -c hk_lean_fungi_bacteria_genus_sparcc.txt -v hk_lean_fungi_bacteria_genus_cov_sparcc.txt 
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_lean/hk_lean_fungi_bacteria_genus_norm.txt -p simulated_hk_lean_fungi_bacteria_genus/ -t permuted_#
-  mkdir boot_hk_lean_fungi_bacteria_genus_corr
- mkdir boot_hk_lean_fungi_bacteria_genus_cov
- for i in `seq 0 99`; 
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_lean/hk_lean_fungi_bacteria_genus_norm.txt -c hk_lean_fungi_bacteria_genus_sparcc.txt -v hk_lean_fungi_bacteria_genus_cov_sparcc.txt 
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_lean/hk_lean_fungi_bacteria_genus_norm.txt -p simulated_hk_lean_fungi_bacteria_genus/ -t permuted_#
+mkdir boot_hk_lean_fungi_bacteria_genus_corr
+mkdir boot_hk_lean_fungi_bacteria_genus_cov
+for i in `seq 0 99`; 
 do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_lean_fungi_bacteria_genus/permuted_$i -c boot_hk_lean_fungi_bacteria_genus_corr/simulated_sparcc_$i.txt -v boot_hk_lean_fungi_bacteria_genus_cov/simulated_sparcc_$i.txt  hk_lean_fungi_bacteria_genus_boot_sparcc.log
 ; done
- mkdir hk_lean_fungi_bacteria_genus_pvals
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_lean_fungi_bacteria_genus_sparcc.txt boot_hk_lean_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o hk_lean_fungi_bacteria_genus_pvals/hk_lean_fungi_bacteria_genus_one_sided.txt -t one_sided
+mkdir hk_lean_fungi_bacteria_genus_pvals
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_lean_fungi_bacteria_genus_sparcc.txt boot_hk_lean_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o hk_lean_fungi_bacteria_genus_pvals/hk_lean_fungi_bacteria_genus_one_sided.txt -t one_sided
 in r
- hk_lean_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\t",check.names=F))
- hk_lean_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\t",check.names=F))
- hk_lean_fungi_bacteria_genus_merge<-
+hk_lean_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\t",check.names=F))
+hk_lean_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_lean/data/hk_lean_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\t",check.names=F))
+hk_lean_fungi_bacteria_genus_merge<-
 list(hk_lean_fungi_bacteria_genus_sparcc1,hk_lean_fungi_bacteria_genus_one_sided1)
 corrplot(hk_lean_fungi_bacteria_genus_merge[[1]],is.corr=FALSE,mar=c(6,0,0,4),cl.lim = c(-1, 1),p.mat=hk_lean_fungi_bacteria_genus_merge[[2]],insig="blank",tl.cex=0.8,tl.col="black",tl.offset=0.5,cl.pos = "r",cl.offset=0.1,cl.cex=0.8,sig.level = 0.05)
 #calculating r and p value
- hk_lean_fungi_bacteria_genus_co<-hk_lean_fungi_bacteria_genus_sparcc1
- hk_lean_fungi_bacteria_genus_co[lower.tri(hk_lean_fungi_bacteria_genus_co,diag=TRUE)]<-NA
- hk_lean_fungi_bacteria_genus_co <- as.data.frame(as.table(hk_lean_fungi_bacteria_genus_co))
- hk_lean_fungi_bacteria_genus_co <- na.omit(hk_lean_fungi_bacteria_genus_co)
- names(hk_lean_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")
- write.table(hk_lean_fungi_bacteria_genus_co, file="genus/hk_lean/data/hk_lean_fungi_bacteria_genus_co.txt", sep = "\t",dec=".",row.names = F)
+hk_lean_fungi_bacteria_genus_co<-hk_lean_fungi_bacteria_genus_sparcc1
+hk_lean_fungi_bacteria_genus_co[lower.tri(hk_lean_fungi_bacteria_genus_co,diag=TRUE)]<-NA
+hk_lean_fungi_bacteria_genus_co <- as.data.frame(as.table(hk_lean_fungi_bacteria_genus_co))
+hk_lean_fungi_bacteria_genus_co <- na.omit(hk_lean_fungi_bacteria_genus_co)
+names(hk_lean_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")
+write.table(hk_lean_fungi_bacteria_genus_co, file="genus/hk_lean/data/hk_lean_fungi_bacteria_genus_co.txt", sep = "\t",dec=".",row.names = F)
 
- hk_lean_fungi_bacteria_genus_p <- hk_lean_fungi_bacteria_genus_one_sided1
- hk_lean_fungi_bacteria_genus_p[lower.tri(hk_lean_fungi_bacteria_genus_p, diag = TRUE)] <- NA
+hk_lean_fungi_bacteria_genus_p <- hk_lean_fungi_bacteria_genus_one_sided1
+hk_lean_fungi_bacteria_genus_p[lower.tri(hk_lean_fungi_bacteria_genus_p, diag = TRUE)] <- NA
 hk_lean_fungi_bacteria_genus_p <- as.data.frame(as.table(hk_lean_fungi_bacteria_genus_p))
- hk_lean_fungi_bacteria_genus_p2  <- na.omit(hk_lean_fungi_bacteria_genus_p)
- names(hk_lean_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")
- hk_lean_fungi_bacteria_genus.out <- merge(hk_lean_fungi_bacteria_genus_co,hk_lean_fungi_bacteria_genus_p2)
- hk_lean_fungi_bacteria_genus.out <- hk_lean_fungi_bacteria_genus.out[order(-abs(hk_lean_fungi_bacteria_genus.out$Correlation)),]
- write.table(hk_lean_fungi_bacteria_genus.out, file="genus/hk_lean/data/hk_lean_fungi_bacteria_genus_correlation.txt", sep = "\t",dec=".",row.names = F)
+hk_lean_fungi_bacteria_genus_p2  <- na.omit(hk_lean_fungi_bacteria_genus_p)
+names(hk_lean_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")
+hk_lean_fungi_bacteria_genus.out <- merge(hk_lean_fungi_bacteria_genus_co,hk_lean_fungi_bacteria_genus_p2)
+hk_lean_fungi_bacteria_genus.out <- hk_lean_fungi_bacteria_genus.out[order(-abs(hk_lean_fungi_bacteria_genus.out$Correlation)),]
+write.table(hk_lean_fungi_bacteria_genus.out, file="genus/hk_lean/data/hk_lean_fungi_bacteria_genus_correlation.txt", sep = "\t",dec=".",row.names = F)
 
 #hk_obese
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_obese/hk_obese_fungi_bacteria_genus_norm.txt -c hk_obese_fungi_bacteria_genus_sparcc.txt -v hk_obese_fungi_bacteria_genus_cov_sparcc.txt 
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_obese/hk_obese_fungi_bacteria_genus_norm.txt -p simulated_hk_obese_fungi_bacteria_genus/ -t permuted_#
-  mkdir boot_hk_obese_fungi_bacteria_genus_corr
- mkdir boot_hk_obese_fungi_bacteria_genus_cov
- for i in `seq 0 99`; 
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_obese/hk_obese_fungi_bacteria_genus_norm.txt -c hk_obese_fungi_bacteria_genus_sparcc.txt -v hk_obese_fungi_bacteria_genus_cov_sparcc.txt 
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/MakeBootstraps.py /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/genus/hk_obese/hk_obese_fungi_bacteria_genus_norm.txt -p simulated_hk_obese_fungi_bacteria_genus/ -t permuted_#
+mkdir boot_hk_obese_fungi_bacteria_genus_corr
+mkdir boot_hk_obese_fungi_bacteria_genus_cov
+for i in `seq 0 99`; 
 do python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/SparCC.py simulated_hk_obese_fungi_bacteria_genus/permuted_$i -c boot_hk_obese_fungi_bacteria_genus_corr/simulated_sparcc_$i.txt -v boot_hk_obese_fungi_bacteria_genus_cov/simulated_sparcc_$i.txt  hk_obese_fungi_bacteria_genus_boot_sparcc.log
 ; done
- mkdir hk_obese_fungi_bacteria_genus_pvals
- python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_obese_fungi_bacteria_genus_sparcc.txt boot_hk_obese_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o hk_obese_fungi_bacteria_genus_pvals/hk_obese_fungi_bacteria_genus_one_sided.txt -t one_sided
+mkdir hk_obese_fungi_bacteria_genus_pvals
+python /lustre/project/SCNg/zhanhui/obesity_health/sparcc/SparCC/PseudoPvals.py hk_obese_fungi_bacteria_genus_sparcc.txt boot_hk_obese_fungi_bacteria_genus_corr/simulated_sparcc_#.txt 100 -o hk_obese_fungi_bacteria_genus_pvals/hk_obese_fungi_bacteria_genus_one_sided.txt -t one_sided
 in r
- hk_obese_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_obese/data/hk_obese_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\t",check.names=F))
- hk_obese_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_obese/data/hk_obese_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\t",check.names=F))
- hk_obese_fungi_bacteria_genus_merge<-
+hk_obese_fungi_bacteria_genus_sparcc1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_obese/data/hk_obese_fungi_bacteria_genus_sparcc1.txt",header=T,row.names=1,sep="\t",check.names=F))
+hk_obese_fungi_bacteria_genus_one_sided1 <- as.matrix(read.table("D:/phd/fungi analysis/HMS/hui's results/results/correlation/fungi-bacteria/genus/hk_obese/data/hk_obese_fungi_bacteria_genus_one_sided1.txt",header=T,row.names=1,sep="\t",check.names=F))
+hk_obese_fungi_bacteria_genus_merge<-
 list(hk_obese_fungi_bacteria_genus_sparcc1,hk_obese_fungi_bacteria_genus_one_sided1)
 corrplot(hk_obese_fungi_bacteria_genus_merge[[1]],is.corr=FALSE,mar=c(6,0,0,4),cl.lim = c(-1, 1),p.mat=hk_obese_fungi_bacteria_genus_merge[[2]],insig="blank",tl.cex=0.8,tl.col="black",tl.offset=0.5,cl.pos = "r",cl.offset=0.1,cl.cex=0.8,sig.level = 0.05)
 #calculating r and p value
- hk_obese_fungi_bacteria_genus_co<-hk_obese_fungi_bacteria_genus_sparcc1
- hk_obese_fungi_bacteria_genus_co[lower.tri(hk_obese_fungi_bacteria_genus_co,diag=TRUE)]<-NA
- hk_obese_fungi_bacteria_genus_co <- as.data.frame(as.table(hk_obese_fungi_bacteria_genus_co))
- hk_obese_fungi_bacteria_genus_co <- na.omit(hk_obese_fungi_bacteria_genus_co)
- names(hk_obese_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")
- write.table(hk_obese_fungi_bacteria_genus_co, file="genus/hk_obese/data/hk_obese_fungi_bacteria_genus_co.txt", sep = "\t",dec=".",row.names = F)
+hk_obese_fungi_bacteria_genus_co<-hk_obese_fungi_bacteria_genus_sparcc1
+hk_obese_fungi_bacteria_genus_co[lower.tri(hk_obese_fungi_bacteria_genus_co,diag=TRUE)]<-NA
+hk_obese_fungi_bacteria_genus_co <- as.data.frame(as.table(hk_obese_fungi_bacteria_genus_co))
+hk_obese_fungi_bacteria_genus_co <- na.omit(hk_obese_fungi_bacteria_genus_co)
+names(hk_obese_fungi_bacteria_genus_co) <- c("Var1", "Var2", "Correlation")
+write.table(hk_obese_fungi_bacteria_genus_co, file="genus/hk_obese/data/hk_obese_fungi_bacteria_genus_co.txt", sep = "\t",dec=".",row.names = F)
 
- hk_obese_fungi_bacteria_genus_p <- hk_obese_fungi_bacteria_genus_one_sided1
- hk_obese_fungi_bacteria_genus_p[lower.tri(hk_obese_fungi_bacteria_genus_p, diag = TRUE)] <- NA
+hk_obese_fungi_bacteria_genus_p <- hk_obese_fungi_bacteria_genus_one_sided1
+hk_obese_fungi_bacteria_genus_p[lower.tri(hk_obese_fungi_bacteria_genus_p, diag = TRUE)] <- NA
 hk_obese_fungi_bacteria_genus_p <- as.data.frame(as.table(hk_obese_fungi_bacteria_genus_p))
- hk_obese_fungi_bacteria_genus_p2  <- na.omit(hk_obese_fungi_bacteria_genus_p)
- names(hk_obese_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")
- hk_obese_fungi_bacteria_genus.out <- merge(hk_obese_fungi_bacteria_genus_co,hk_obese_fungi_bacteria_genus_p2)
- hk_obese_fungi_bacteria_genus.out <- hk_obese_fungi_bacteria_genus.out[order(-abs(hk_obese_fungi_bacteria_genus.out$Correlation)),]
- write.table(hk_obese_fungi_bacteria_genus.out, file="genus/hk_obese/data/hk_obese_fungi_bacteria_genus_correlation.txt", sep = "\t",dec=".",row.names = F)
+hk_obese_fungi_bacteria_genus_p2  <- na.omit(hk_obese_fungi_bacteria_genus_p)
+names(hk_obese_fungi_bacteria_genus_p2) <- c("Var1", "Var2", "p")
+hk_obese_fungi_bacteria_genus.out <- merge(hk_obese_fungi_bacteria_genus_co,hk_obese_fungi_bacteria_genus_p2)
+hk_obese_fungi_bacteria_genus.out <- hk_obese_fungi_bacteria_genus.out[order(-abs(hk_obese_fungi_bacteria_genus.out$Correlation)),]
+write.table(hk_obese_fungi_bacteria_genus.out, file="genus/hk_obese/data/hk_obese_fungi_bacteria_genus_correlation.txt", sep = "\t",dec=".",row.names = F)
 
 #km_lean
 
