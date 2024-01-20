@@ -622,31 +622,29 @@ write.table(otu, file="correlation/otu.csv", sep = " ,",dec=".",col.names = TRUE
 otu <- read.csv("D:/phd/fungi analysis/HMS/tao's results/tao's_km_data/NMDS/correlation/otu.csv",row.names=1,header=T)
 occor<-corr.test(otu,use="pairwise",method="spearman",adjust="fdr",alpha=0.5)
 
- occor.r=occor$r
- occor.p=occor$p
- occor.r[occor.p0.05|abs(occor.r)<0.1] = 0 
- igraph = graph_from_adjacency_matrix(occor.r,mode="undirected",weighted=TRUE,diag=FALSE)
- igraph
- occor.r[occor.r!=0] = 1
- igraph = graph_from_adjacency_matrix(occor.r,mode="undirected",weighted=NULL,diag=FALSE)
- bad.vs = V(igraph)[degree(igraph) == 0]
- igraph = delete.vertices(igraph, bad.vs)
- igraph
- igraph.weight = E(igraph)$weight
- E(igraph)$weight = NA
- set.seed(123)
- plot(igraph,main="Co-occurrence network",vertex.frame.color=NA,vetex.color="plum", vertex.label=NA,edge.width=1,vertex.size=5,edge.lty=1,edge.curved=TRUE,margin=c(0,0,0,0),layout=layout_in_circle)
-
- bad.vs = V(igraph)[degree(igraph) == 0]
- igraph = delete.vertices(igraph, bad.vs)
- igraph
- igraph.weight = E(igraph)$weight
- E(igraph)$weight = NA
- sum(igraph.weight0)# number of postive correlation
- sum(igraph.weight<0)# number of negative correlation
- E.color = igraph.weight
- E.color = ifelse(E.color0, "red",ifelse(E.color<0, "blue","grey"))
- E(igraph)$color = as.character(E.color)
+occor.r=occor$r
+occor.p=occor$p
+occor.r[occor.p0.05|abs(occor.r)<0.1] = 0
+igraph = graph_from_adjacency_matrix(occor.r,mode="undirected",weighted=TRUE,diag=FALSE)
+igraph
+occor.r[occor.r!=0] = 1
+igraph = graph_from_adjacency_matrix(occor.r,mode="undirected",weighted=NULL,diag=FALSE)
+bad.vs = V(igraph)[degree(igraph) == 0]
+igraph = delete.vertices(igraph, bad.vs)
+igraph
+igraph.weight = E(igraph)$weight
+E(igraph)$weight = NA
+set.seed(123)
+bad.vs = V(igraph)[degree(igraph) == 0]
+igraph = delete.vertices(igraph, bad.vs)
+igraph
+igraph.weight = E(igraph)$weight
+E(igraph)$weight = NA
+sum(igraph.weight0)# number of postive correlation
+sum(igraph.weight<0)# number of negative correlation
+E.color = igraph.weight
+E.color = ifelse(E.color0, "red",ifelse(E.color<0, "blue","grey"))
+E(igraph)$color = as.character(E.color)
 
 library(qgraph)
 library(vegan)
